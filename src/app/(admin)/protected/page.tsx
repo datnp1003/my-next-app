@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import SignOutButton from '@/components/SignOutButton';
+import SignOutButton from '@/components/layout/SignOutButton';
 export default async function DashboardPage() {
   /**
    * getServerSession chỉ thực hiện trên server
@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const session = await getServerSession();
 
   if (!session) {
-    redirect('/login');
+    redirect('/login?redirect=/protected');
   }
 
   return (

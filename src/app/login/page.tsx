@@ -2,13 +2,15 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/'; // Mặc định về trang chủ nếu không có redirect
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,12 +22,10 @@ export default function LoginPage() {
       password,
     });
 
-    console.log(result);
-
     if (result?.error) {
       setError('Email hoặc mật khẩu không đúng');
     } else {
-      router.push('/'); // Chuyển hướng sau khi đăng nhập thành công
+      router.push(redirect); // Chuyển hướng đến URL từ query parameter
     }
   };
 

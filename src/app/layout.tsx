@@ -3,6 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import './globals.css';
 import Link from 'next/link';
 import { SessionProvider } from 'next-auth/react';
+import Header from "@/components/layout/header";
+import Navbar from "@/components/layout/navbar";
+
 
 // export const metadata = {
 //   title: 'Auth App',
@@ -16,16 +19,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-gray-50">
       <SessionProvider>
       <QueryClientProvider client={queryClient}>
-        <header className="bg-blue-600 text-white p-4">
-          <nav className="container mx-auto flex justify-between">
-            <h1 className="text-2xl font-bold">Auth App</h1>
-            <ul className="flex space-x-4">
-              <li><Link href="/register" className="hover:underline">Register</Link></li>
-              <li><Link href="/login" className="hover:underline">Login</Link></li>
-            </ul>
-          </nav>
-        </header>
-        <main className="container mx-auto p-4">{children}</main>
+        
+        <div className="flex h-screen">
+            <Navbar />
+            <div className="flex-1 flex flex-col">
+              <Header />
+              <main className="flex-1 px-8 py-6 mt-16">
+                {children}
+              </main>
+            </div>
+          </div>
         </QueryClientProvider>
         </SessionProvider>
       </body>
