@@ -20,13 +20,13 @@ export const authOptions = {
           where: { email: credentials.email },
         });
 
-        // if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
-        //   return null;
-        // }
-
-        if (!user) {
+        if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
           return null;
         }
+
+        // if (!user) {
+        //   return null;
+        // }
 
         return {
           id: user.id.toString(),
