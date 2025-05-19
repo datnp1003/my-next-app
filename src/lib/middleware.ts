@@ -17,7 +17,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Nếu chưa đăng nhập, chuyển hướng đến /login
+  // Nếu chưa đăng nhập hoặc token hết hạn, chuyển hướng đến /login
   if (!token) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('redirect', pathname);

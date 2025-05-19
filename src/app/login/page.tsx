@@ -25,7 +25,9 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Email hoặc mật khẩu không đúng');
     } else {
-      //router.push(redirect); // Chuyển hướng đến URL từ query parameter
+      // Chuyển hướng đến trang user sau khi đăng nhập thành công
+      router.push('/user');
+      router.refresh();
     }
   };
 
