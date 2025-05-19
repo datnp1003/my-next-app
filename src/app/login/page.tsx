@@ -25,7 +25,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Email hoặc mật khẩu không đúng');
     } else {
-      router.push(redirect); // Chuyển hướng đến URL từ query parameter
+      //router.push(redirect); // Chuyển hướng đến URL từ query parameter
     }
   };
 
