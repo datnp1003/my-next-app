@@ -136,7 +136,7 @@ export default function Home() {
                 className={`
                   w-9 h-9 p-0
                   ${pageNum === page 
-                    ? "bg-sky-900 text-white" 
+                    ? "bg-sky-900 text-white hover:none" 
                     : "hover:bg-gray-300"}
                 `}
               >

@@ -9,6 +9,7 @@ const getUser = async () => {
     const data = await res.json();
     return data;
 };
+
 //hàm phân trang
 const paging = async (req: PagingRequest) => {
     const res = await fetch('/api/user/paging', {
