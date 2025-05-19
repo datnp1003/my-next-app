@@ -1,4 +1,8 @@
 'use client';
+import { useSession, signOut } from 'next-auth/react';
+import { redirect } from 'next/navigation';
+
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
@@ -9,6 +13,12 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Input } from '@/components/ui/input';
 
 export default function Home() {
+    const { data: session, status } = useSession();
+
+    if (!session) {
+        redirect('/login?redirect=/user');
+    }
+
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState({
         name: '',
@@ -162,4 +172,3 @@ export default function Home() {
         </div>
     );
 }
-
