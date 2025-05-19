@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -9,19 +10,20 @@ export default function Login() {
     const [error, setError] = useState('');
     const router = useRouter();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
-        const res = await fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
+        setError('');
+
+        const result = await signIn('credentials', {
+            redirect: false,
+            email,
+            password,
         });
-        const data = await res.json();
-        console.log(data);
-        if (res.ok) {
-            router.push('/protected');
+
+        if (result!.error) {
+            setError('Sai tên đăng nhập hoặc mật khẩu');
         } else {
-            setError(data.error || 'Something went wrong');
+            router.push('/'); // Chuyển hướng sau khi đăng nhập thành công
         }
     };
 
