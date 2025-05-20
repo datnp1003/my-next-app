@@ -8,27 +8,32 @@ import {
   Boxes,
   Store
 } from "lucide-react";
+import { useTranslation } from 'react-i18next';
 
+
+
+
+export default function Navbar() {
+  const { t } = useTranslation('common');
+
+  const pathname = usePathname();
 const menuItems = [
   {
-    title: "Dashboard",
+    title: "{t('navbar.home')}",
     href: "/dashboard",
     icon: LayoutDashboard
   },
   {
-    title: "Quản lý người dùng",
+    title: "{t('navbar.user')}",
     href: "/user",
     icon: UserCircle2
   },
   {
-    title: "Quản lý sản phẩm",
+    title: "{t('navbar.product')}",
     href: "/products",
     icon: Boxes
   }
 ];
-
-export default function Navbar() {
-  const pathname = usePathname();
 
   return (
     <nav className="w-64 h-screen bg-sky-900 shadow-sm flex flex-col">

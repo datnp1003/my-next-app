@@ -85,8 +85,8 @@ export default function Home() {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
-                                    <Button className='bg-orange-500 text-white hover:bg-white hover:text-orange-500' variant={'outline'}>Sửa</Button>
-                                    <Button className='bg-slate-500 text-white hover:bg-white hover:text-slate-500'>Xóa</Button>
+                                    <Button className='bg-orange-500 text-white hover:bg-white hover:text-orange-500' variant={'outline'}>{t('action.edit')}</Button>
+                                    <Button className='bg-slate-500 text-white hover:bg-white hover:text-slate-500'>{t('action.delete')}</Button>
                                 </div>
                             </TableCell>
                         </TableRow>

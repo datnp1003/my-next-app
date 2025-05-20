@@ -15,5 +15,15 @@
   "language_switcher": {
     "vi": "Vietnamese",
     "en": "English"
+  },
+  "navbar": {
+    "home": "Dashboard",
+    "user": "User Management",
+    "product": "Product Management"
+  },
+  "action": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

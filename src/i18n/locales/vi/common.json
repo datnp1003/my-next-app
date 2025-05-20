@@ -15,5 +15,15 @@
   "language_switcher": {
     "vi": "Tiếng Việt",
     "en": "English"
+  },
+  "navbar": {
+    "home": "Trang chủ",
+    "user": "Quản lý người dùng",
+    "product": "Quản lý sản phẩm"
+  },
+  "action": {
+    "add": "Thêm",
+    "edit": "Sửa",
+    "delete": "Xóa"
   }
 }
