@@ -9,8 +9,10 @@ import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+    const { t } = useTranslation('common');
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState({
         name: '',
@@ -58,7 +60,7 @@ export default function Home() {
                 <TableHeader>
                     <TableRow className='bg-sky-100 border border-gray-300 text-gray-700'>
                         <TableHead className="w-[100px]">STT</TableHead>
-                        <TableHead className="cursor-pointer hover:text-sky-950">Tên
+                        <TableHead className="cursor-pointer hover:text-sky-950">{t('user.name')}
                             <Input
                                     type="text"
                                     placeholder="Tìm kiếm tên"
@@ -164,3 +166,4 @@ export default function Home() {
         </div>
     );
 }
+

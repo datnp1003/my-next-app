@@ -1,0 +1,19 @@
+{
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "error": "Invalid username or password",
+    "register_link": "Register an account"
+  },
+  "user": {
+    "welcome": "Hello, {{name}}!",
+    "logout": "Logout",
+    "name": "Name"
+  },
+  "language_switcher": {
+    "vi": "Vietnamese",
+    "en": "English"
+  }
+}
