@@ -10,9 +10,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
+import router from 'next/router';
 
 export default function Home() {
     const { t } = useTranslation('common');
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState({
         name: '',
@@ -56,11 +58,19 @@ export default function Home() {
     }
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
+            <div className="text-right mb-4">
+                <Button 
+                    onClick={() => router.push('/user/add')}
+                    className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
+                >
+                    {t('action.add')}
+                </Button>
+            </div>
             <Table className='border border-gray-300'>
                 <TableHeader>
                     <TableRow className='bg-sky-100 border border-gray-300 text-gray-700'>
-                        <TableHead className="w-[100px]">No.</TableHead>
-                        <TableHead className="cursor-pointer hover:text-sky-950">{t('user.name')}
+                        <TableHead className="w-[10%]">No.</TableHead>
+                        <TableHead className="w-[30%] cursor-pointer hover:text-sky-950">{t('user.name')}
                             {/* <Input
                                     type="text"
                                     placeholder="Tìm kiếm tên"
@@ -73,8 +83,8 @@ export default function Home() {
                                     }}
                                 /> */}
                         </TableHead>
-                        <TableHead className="cursor-pointer hover:text-sky-950">Email</TableHead>
-                        <TableHead></TableHead>
+                        <TableHead className="w-[40%] cursor-pointer hover:text-sky-950">Email</TableHead>
+                        <TableHead className='w-[20%]'></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -85,8 +95,18 @@ export default function Home() {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
-                                    <Button className='bg-orange-500 text-white hover:bg-white hover:text-orange-500' variant={'outline'}>{t('action.edit')}</Button>
-                                    <Button className='bg-slate-500 text-white hover:bg-white hover:text-slate-500'>{t('action.delete')}</Button>
+                                    <Button 
+                                        className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent' 
+                                        variant={'outline'}
+                                    >
+                                        {t('action.edit')}
+                                    </Button>
+                                    <Button 
+                                        className='bg-slate-500 text-white hover:bg-white hover:text-slate-500 hover:border-slate-500 border border-transparent'
+                                        variant={'outline'}
+                                    >
+                                        {t('action.delete')}
+                                    </Button>
                                 </div>
                             </TableCell>
                         </TableRow>

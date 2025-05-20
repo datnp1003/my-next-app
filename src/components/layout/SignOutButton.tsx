@@ -5,9 +5,9 @@ export default function SignOutButton() {
   return (
     <button
       onClick={() => signOut({ callbackUrl: '/login' })}
-      className="mt-4 bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
+      className="mt-4 bg-gray-500 text-s text-white p-2 rounded-md hover:bg-sky-900"
     >
-      Đăng xuất
+      Sign Out
     </button>
   );
 }
