@@ -30,5 +30,9 @@
     "show": "Hiển thị",
     "of": "của",
     "entries": "mục"
+  },
+  "protected": {
+    "title": "Welcome to the protected page",
+    "content": "Xin chào"
   }
 }

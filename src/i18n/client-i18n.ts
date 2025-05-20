@@ -21,24 +21,13 @@ i18next
     }
   });
 
-/**
- * Hook cung cấp các hàm dịch và chuyển đổi ngôn ngữ phía client
- * @param namespace Namespace của bản dịch (mặc định: 'common')
- * @returns Các hàm và thông tin liên quan đến bản dịch
- */
+// Custom hook để sử dụng i18n ở client side
 export function useTranslations(namespace: string = 'common') {
   const { t, i18n } = useTranslation(namespace);
-
-  // Hàm dịch chuỗi
-  const translate = (key: string, options?: TOptions) => {
-    return t(key, options);
+  
+  return {
+    translate: t,  // Hàm dịch text
+    changeLanguage: i18n.changeLanguage,  // Đổi ngôn ngữ
+    currentLocale: i18n.language  // Ngôn ngữ hiện tại
   };
-
-  // Hàm chuyển đổi ngôn ngữ
-  const changeLanguage = (locale: string) => i18n.changeLanguage(locale);
-
-  // Ngôn ngữ hiện tại
-  const currentLocale: string = i18n.language;
-
-  return { translate, changeLanguage, currentLocale };
 }
