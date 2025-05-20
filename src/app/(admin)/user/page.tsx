@@ -96,7 +96,7 @@ export default function Home() {
 
             <div className="flex justify-between items-center mt-8">
                 <div className="flex items-center gap-2">
-                    <span>Hiển thị:</span>
+                    <span>{t('paging.show')}</span>
                     <Select
                         value={pageSize.toString()}
                         onValueChange={(value) => {
@@ -114,7 +114,7 @@ export default function Home() {
                             <SelectItem value="50">50</SelectItem>
                         </SelectContent>
                     </Select>
-                    <span>mỗi trang</span>
+                    <span>{t('paging.entries')}</span>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -160,7 +160,7 @@ export default function Home() {
                 </div>
 
                 <div>
-                    {data.pageSize*(data.page -1)+ 1} - {(data.pageSize*(data.page -1)) + data.data.length} của {data?.totalItem || 1}
+                    {data.pageSize*(data.page -1)+ 1} - {(data.pageSize*(data.page -1)) + data.data.length} {t('paging.of')} {data?.totalItem || 1}
                 </div>
             </div>
         </div>

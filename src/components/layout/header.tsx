@@ -1,10 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Bell, UserCircle2 } from "lucide-react";
 import LanguageSwitcher from "./LanguageSwitcher";
-import { getServerTranslations } from "@/i18n/i18n";
 
 export default function Header() {
   return (

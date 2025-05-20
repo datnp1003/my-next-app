@@ -25,5 +25,10 @@
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete"
+  },
+  "paging": {
+    "show": "Show",
+    "of": "of",
+    "entries": "entries"
   }
 }

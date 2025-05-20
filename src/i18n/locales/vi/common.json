@@ -25,5 +25,10 @@
     "add": "Thêm",
     "edit": "Sửa",
     "delete": "Xóa"
+  },
+  "paging": {
+    "show": "Hiển thị",
+    "of": "của",
+    "entries": "mục"
   }
 }

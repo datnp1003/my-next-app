@@ -86,7 +86,7 @@ export default function LoginPage() {
             {t('login.submit')}
           </button>
           <div className="text-center mt-4 hover:text-blue-500">
-            <a href='/register'>{t('login.register_link')}</a>
+            <a href="/register">{t('login.register_link')}</a>
           </div>
         </form>
       </div>
