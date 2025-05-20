@@ -5,22 +5,26 @@ import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 // Update the import path below if your LanguageSwitcher is located elsewhere
 import LanguageSwitcher from "../../components/layout/LanguageSwitcher";
+import { useTranslation } from 'react-i18next';
+import { Link } from 'lucide-react';
 
 
 export default function LoginPage() {
+  const { t } = useTranslation('common');
   const { data: session, status } = useSession();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
-  const searchParams = useSearchParams();
   
 
   useEffect(() => {
     if (session) {
-      router.replace('/user');
+      router.replace(redirectUrl);
     }
-  }, [session, router]);
+  }, [session, router, redirectUrl]);
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -43,8 +47,7 @@ export default function LoginPage() {
     if (result?.error) {
       setError('Email hoặc mật khẩu không đúng');
     } else {
-      // Chuyển hướng đến trang user sau khi đăng nhập thành công
-      router.push('/user');
+      router.replace(redirectUrl);
       router.refresh();
     }
   };
@@ -53,10 +56,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
         <LanguageSwitcher />
-        <h1 className="text-2xl font-bold mb-6 text-center">Đăng nhập</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">{t('login.title')}</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
+            <label className="block text-sm font-medium text-gray-700">{t('login.username')}</label>
             <input
               type="email"
               value={email}
@@ -66,7 +69,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700">Mật khẩu</label>
+            <label className="block text-sm font-medium text-gray-700">{t('login.password')}</label>
             <input
               type="password"
               value={password}
@@ -80,8 +83,11 @@ export default function LoginPage() {
             type="submit"
             className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600"
           >
-            Đăng nhập
+            {t('login.submit')}
           </button>
+          <div className="text-center mt-4 hover:text-blue-500">
+            <a href='/register'>{t('login.register_link')}</a>
+          </div>
         </form>
       </div>
     </div>
