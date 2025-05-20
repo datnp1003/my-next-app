@@ -1,16 +1,34 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { signIn, useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
+// Update the import path below if your LanguageSwitcher is located elsewhere
+import LanguageSwitcher from "../../components/layout/LanguageSwitcher";
+
 
 export default function LoginPage() {
+  const { data: session, status } = useSession();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get('redirect') || '/'; // Mặc định về trang chủ nếu không có redirect
+  
+
+  useEffect(() => {
+    if (session) {
+      router.replace('/user');
+    }
+  }, [session, router]);
+
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+
+  if (session) {
+    return null;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,6 +52,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <LanguageSwitcher />
         <h1 className="text-2xl font-bold mb-6 text-center">Đăng nhập</h1>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

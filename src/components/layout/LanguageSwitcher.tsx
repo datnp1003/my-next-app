@@ -1,18 +1,25 @@
 import { useTranslations } from '@/i18n/client-i18n';
+import Image from 'next/image';
 
 export default function LanguageSwitcher() {
-  const { translate, changeLanguage, currentLocale } = useTranslations('common');
+  const { changeLanguage, currentLocale } = useTranslations('common');
+
+  const toggleLanguage = () => {
+    const newLocale = currentLocale === 'vi' ? 'en' : 'vi';
+    changeLanguage(newLocale);
+  };
 
   return (
-    <div className="mb-4">
-      <select
-        value={currentLocale}
-        onChange={(e) => changeLanguage(e.target.value)}
-        className="p-2 border rounded-md bg-white text-gray-800"
-      >
-        <option value="vi">{translate('language_switcher.vi')}</option>
-        <option value="en">{translate('language_switcher.en')}</option>
-      </select>
-    </div>
+    <button
+      onClick={toggleLanguage}
+      className="flex items-center justify-center w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity"
+    >
+      <Image
+        src={`/img/flags/${currentLocale}.png`}
+        alt={currentLocale === 'vi' ? 'Tiếng Việt' : 'English'}
+        width={25}
+        height={25}
+      />
+    </button>
   );
 }

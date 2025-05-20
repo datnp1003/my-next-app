@@ -59,9 +59,9 @@ export default function Home() {
             <Table className='border border-gray-300'>
                 <TableHeader>
                     <TableRow className='bg-sky-100 border border-gray-300 text-gray-700'>
-                        <TableHead className="w-[100px]">STT</TableHead>
+                        <TableHead className="w-[100px]">No.</TableHead>
                         <TableHead className="cursor-pointer hover:text-sky-950">{t('user.name')}
-                            <Input
+                            {/* <Input
                                     type="text"
                                     placeholder="Tìm kiếm tên"
                                     className="border border-gray-300 rounded p-1 w-full"
@@ -71,7 +71,7 @@ export default function Home() {
                                             name: e.target.value,
                                         }));
                                     }}
-                                />
+                                /> */}
                         </TableHead>
                         <TableHead className="cursor-pointer hover:text-sky-950">Email</TableHead>
                         <TableHead></TableHead>
