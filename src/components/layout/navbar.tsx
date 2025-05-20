@@ -1,39 +1,36 @@
-'use client';
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  UserCircle2, 
-  LayoutDashboard, 
+import {
+  UserCircle2,
+  LayoutDashboard,
   Boxes,
   Store
 } from "lucide-react";
-import { useTranslation } from 'react-i18next';
-
-
-
+import { useTranslations } from '@/i18n/client-i18n';
 
 export default function Navbar() {
-  const { t } = useTranslation('common');
-
+  const { translate: t } = useTranslations('common');
   const pathname = usePathname();
-const menuItems = [
-  {
-    title: "{t('navbar.home')}",
-    href: "/dashboard",
-    icon: LayoutDashboard
-  },
-  {
-    title: "{t('navbar.user')}",
-    href: "/user",
-    icon: UserCircle2
-  },
-  {
-    title: "{t('navbar.product')}",
-    href: "/products",
-    icon: Boxes
-  }
-];
+
+  const menuItems = [
+    {
+      title: t('navbar.home'),
+      href: "/dashboard",
+      icon: LayoutDashboard
+    },
+    {
+      title: t('navbar.user'),
+      href: "/user",
+      icon: UserCircle2
+    },
+    {
+      title: t('navbar.product'),
+      href: "/products",
+      icon: Boxes
+    }
+  ];
 
   return (
     <nav className="w-64 h-screen bg-sky-900 shadow-sm flex flex-col">
