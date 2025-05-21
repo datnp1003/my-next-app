@@ -22,9 +22,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session) {
-      router.replace(redirectUrl);
+      router.push('/user');
     }
-  }, [session, router, redirectUrl]);
+  }, [session, router]);
 
   if (status === 'loading') {
     return <div>Loading...</div>;
