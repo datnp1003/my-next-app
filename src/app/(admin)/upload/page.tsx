@@ -11,7 +11,19 @@ export default function UploadPage() {
   const [error, setError] = useState<string>('');
   const [uploadedUrls, setUploadedUrls] = useState<string[]>([]);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
+  const onDrop = useCallback((acceptedFiles: File[], rejectedFiles: any[]) => {
+    // Clear error when new files are dropped
+    setError('');
+    
+    // Check for rejected files due to size
+    if (rejectedFiles.length > 0) {
+      const sizeErrors = rejectedFiles.filter(file => file.file.size > 100 * 1024);
+      if (sizeErrors.length > 0) {
+        setError(`File size exceeds 100KB limit`);
+        return;
+      }
+    }
+
     setFiles(prev => [...prev, ...acceptedFiles]);
   }, []);
 
@@ -20,7 +32,8 @@ export default function UploadPage() {
     accept: {
       'image/*': ['.jpeg', '.png', '.jpg', '.webp']
     },
-    maxSize: 5 * 1024 * 1024 // 5MB
+    maxSize: 100 * 1024,
+    onDropRejected: () => {} // Remove default error handling
   });
 
   const handleUpload = async () => {
