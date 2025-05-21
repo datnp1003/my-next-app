@@ -41,9 +41,9 @@ session: {
     maxAge: 60 * 60, // Thời gian hết hạn session: 1 giờ (tính bằng giây)
   },
   // //set thời gian hết hạn cho access token
-  // jwt: {
-  //   maxAge: 60 * 1, // Thời gian hết hạn JWT: 1 phút (tính bằng giây)
-  // },
+  jwt: {
+    maxAge: 60 * 60 // Thời gian hết hạn JWT: 1 phút (tính bằng giây)
+  },
 
   secret: process.env.NEXTAUTH_SECRET,
   

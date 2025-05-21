@@ -18,6 +18,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  console.log('Token:', token);
   // Nếu chưa đăng nhập hoặc token hết hạn, chuyển hướng đến /login
   if (!token) {
     const loginUrl = new URL('/login', req.url);

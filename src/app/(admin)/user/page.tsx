@@ -1,10 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table";
 import { Button } from '@/components/ui/button';
-import { paging } from "@/core/domain/user/api";
+import { deleteUser, paging, updateUser } from "@/core/domain/user/api";
 import { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import router from 'next/router';
 
 export default function Home() {
+    const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
     const { t } = useTranslation('common');
     const router = useRouter();
     const [page, setPage] = useState(1);
@@ -21,10 +23,25 @@ export default function Home() {
         email: '',
     });
     const [pageSize, setPageSize] = useState(10);
-    const { data, isLoading, error } = useQuery({
+    const { data, isLoading, error, refetch } = useQuery({
         queryKey: [page,pageSize, JSON.stringify(filter)],
         queryFn: async () => await paging({ page, pageSize, filter }),
     });
+
+    const deleteUserFn = async (id: number) => {
+        const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa người dùng này?');
+        if (!isConfirmed) return;
+        try {
+            const response = await deleteUser(id);
+            if (!response) {
+                throw new Error('Failed to delete user');
+            }
+            setAlert({ message: 'Xóa người dùng thành công.', type: 'success' });
+            await refetch(); 
+        } catch (error) {
+            setAlert({ message: 'Có lỗi khi xóa người dùng. Vui lòng thử lại.', type: 'error' });
+        }
+    }
 
     if (isLoading) return <div>Đang tải...</div>;
 
@@ -56,6 +73,7 @@ export default function Home() {
 
         return rangeWithDots;
     }
+
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
             <div className="text-right mb-4">
@@ -98,12 +116,13 @@ export default function Home() {
                                     <Button 
                                         className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent' 
                                         variant={'outline'}
-                                    >
+                                        onClick={() => router.push(`/user/edit/${user.id}`)}                          >
                                         {t('action.edit')}
                                     </Button>
                                     <Button 
                                         className='bg-slate-500 text-white hover:bg-white hover:text-slate-500 hover:border-slate-500 border border-transparent'
                                         variant={'outline'}
+                                        onClick={() => deleteUserFn(user.id)}
                                     >
                                         {t('action.delete')}
                                     </Button>
