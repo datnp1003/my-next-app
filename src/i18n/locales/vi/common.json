@@ -10,7 +10,11 @@
   "user": {
     "welcome": "Xin chào, {{name}}!",
     "logout": "Đăng xuất",
-    "name": "Tên"
+    "name": "Tên",
+    "password": "Mật khẩu",
+    "email": "Email",
+    "add_title": "Thêm người dùng"
+
   },
   "language_switcher": {
     "vi": "Tiếng Việt",
@@ -24,7 +28,9 @@
   "action": {
     "add": "Thêm",
     "edit": "Sửa",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "save": "Lưu",
+    "cancel": "Hủy"
   },
   "paging": {
     "show": "Hiển thị",

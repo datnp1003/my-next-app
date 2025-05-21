@@ -10,7 +10,10 @@
   "user": {
     "welcome": "Hello, {{name}}!",
     "logout": "Logout",
-    "name": "Name"
+    "name": "Name",
+    "password": "Password",
+    "email": "Email",
+    "add_title": "Add User"
   },
   "language_switcher": {
     "vi": "Vietnamese",
@@ -24,7 +27,9 @@
   "action": {
     "add": "Add",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel"
   },
   "paging": {
     "show": "Show",
