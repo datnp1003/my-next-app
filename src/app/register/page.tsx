@@ -1,14 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function Register() {
     const [email, setEmail] = useState('');
+    const { data: session, status } = useSession();
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+
+    useEffect(() => {
+        if (session) {
+            router.push('/user');
+        }
+    }, [session, router]);
+
+    if (status === 'loading') {
+        return <div>Loading...</div>;
+    }
+
+    if (session) {
+        return null;
+    }
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -36,18 +36,17 @@ export const authOptions = {
       },
     }),
   ],
-
-  //set thời gian hết hạn cho access token
-  jwt: {
-    maxAge: 60 * 1, // Thời gian hết hạn JWT: 1 phút (tính bằng giây)
+session: {
+    // strategy: SessionStrategy.JWT, // Sử dụng JWT cho session
+    maxAge: 60 * 1, // Thời gian hết hạn session: 1 phút (tính bằng giây)
   },
+  // //set thời gian hết hạn cho access token
+  // jwt: {
+  //   maxAge: 60 * 1, // Thời gian hết hạn JWT: 1 phút (tính bằng giây)
+  // },
 
   secret: process.env.NEXTAUTH_SECRET,
-  // session: {
-  //   strategy: 'jwt', // Sử dụng JWT cho session
-  //   maxAge: 60 * 60, // Thời gian hết hạn session: 1 giờ (tính bằng giây)
-  //   updateAge: 24 * 60 * 60, // Cập nhật session mỗi 24 giờ
-  // },
+  
   callbacks: {
     async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
