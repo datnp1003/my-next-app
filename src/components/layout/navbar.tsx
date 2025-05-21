@@ -27,7 +27,7 @@ export default function Navbar() {
     },
     {
       title: t('navbar.product'),
-      href: "/products",
+      href: "/upload",
       icon: Boxes
     }
   ];
