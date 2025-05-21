@@ -8,7 +8,7 @@ import {
   Boxes,
   Store
 } from "lucide-react";
-import { useTranslations } from '@/i18n/client-i18n';
+import { useTranslations } from '@/i18n/client';
 
 export default function Navbar() {
   const { translate: t } = useTranslations('common');

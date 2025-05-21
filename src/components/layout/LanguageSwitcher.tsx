@@ -1,4 +1,4 @@
-import { useTranslations } from '@/i18n/client-i18n';
+import { useTranslations } from '@/i18n/client';
 import Image from 'next/image';
 
 export default function LanguageSwitcher() {
