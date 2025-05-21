@@ -87,6 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 import { NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
+import prisma from '@/lib/prisma';
 
 export async function POST(request: Request) {
   try {
@@ -107,17 +108,30 @@ export async function POST(request: Request) {
         await writeFile(filePath, buffer);
         return `/uploads/${fileName}`;
       })
+      
+    );
+
+    // Lưu URLs vào database
+    const savedImages = await prisma.$transaction(
+      uploadedFiles.map((url) =>
+        prisma.image.create({
+          data: { 
+            url,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        })
+      )
     );
 
     return NextResponse.json({
       success: true,
-      files: uploadedFiles
+      files: savedImages
     });
-
-  } catch (error: any) {
+  } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: error.message || 'Upload failed' },
+      { error: 'Upload failed' },
       { status: 500 }
     );
   }

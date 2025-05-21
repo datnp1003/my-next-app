@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
 
 export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -34,6 +35,15 @@ export default function UploadPage() {
     },
     maxSize: 100 * 1024,
     onDropRejected: () => {} // Remove default error handling
+  });
+
+  const { data: imageList } = useQuery({
+    queryKey: ['images'],
+    queryFn: async () => {
+      const res = await fetch('/api/image');
+      const data = await res.json();
+      return data.images;
+    }
   });
 
   const handleUpload = async () => {
@@ -132,6 +142,24 @@ export default function UploadPage() {
                   key={index}
                   src={url}
                   alt={`Uploaded ${index + 1}`}
+                  width={200}
+                  height={200}
+                  className="rounded-lg object-cover"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {imageList && imageList.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">All Uploaded Images</h3>
+            <div className="grid grid-cols-3 gap-4">
+              {imageList.map((image: any) => (
+                <Image
+                  key={image.id}
+                  src={image.url}
+                  alt={`Uploaded ${image.id}`}
                   width={200}
                   height={200}
                   className="rounded-lg object-cover"
