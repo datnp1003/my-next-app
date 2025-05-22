@@ -9,12 +9,31 @@ import React, { useState, useEffect } from 'react';
 import { updateUser, getUserById } from '@/core/domain/user/api';
 import { User } from '@prisma/client';
 import { UserVM } from '@/core/domain/user/user.model';
+import { Form, FormField, FormItem, FormLabel } from '@/components/ui/form';
+
+import { useForm } from 'react-hook-form';
+import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+
+const formSchema = z.object({
+  name: z.string().min(2).max(100),
+  email: z.string().email(),
+  password: z.string().min(6).max(100),
+});
 
 export default function EditUserPage() {
   const router = useRouter();
   const params = useParams();
   const { t } = useTranslation('common');
   const id = params.id as string;
+
+  const form = useForm({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        name: '',
+        email: '',
+      },
+    });
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -59,19 +78,38 @@ export default function EditUserPage() {
             {alert.message}
           </div>
         )}
-        <form onSubmit={updateUserFn}>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('user.name')}</label>
-            <Input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('user.email')}</label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('user.password')}</label>
-            <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
+        <Form {...form}>
+          <form onSubmit={updateUserFn} className="space-y-4">
+            <FormField
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="block text-sm font-medium mb-1">{t('user.name')}</FormLabel>
+                  <Input type="text" {...field} value={name} onChange={(e) => { setName(e.target.value); field.onChange(e); }} required />
+                </FormItem>
+              )}
+            />
+
+          <FormField
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block text-sm font-medium mb-1">{t('user.email')}</FormLabel>
+                <Input type="email" {...field} value={email} onChange={(e) => { setEmail(e.target.value); field.onChange(e); }} required />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="block text-sm font-medium mb-1">{t('user.password')}</FormLabel>
+                <Input type="password" {...field} value={password} onChange={(e) => { setPassword(e.target.value); field.onChange(e); }} />
+              </FormItem>
+            )}
+          />
+
           <div className="flex justify-end gap-4 mt-6">
             <Button
               type="button"
@@ -82,12 +120,12 @@ export default function EditUserPage() {
             </Button>
             <Button
               type="submit"
-              className="bg-sky-900 text-white hover:bg-sky-800"
-            >
+              className="bg-sky-900 text-white hover:bg-sky-800"            >
               {t('action.save')}
             </Button>
           </div>
-        </form>
+          </form>
+        </Form>
       </div>
     </div>
   );
