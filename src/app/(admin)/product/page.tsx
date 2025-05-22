@@ -24,7 +24,7 @@ export default function Home() {
 
     const [pageSize, setPageSize] = useState(10);
     const { data, isLoading, error, refetch } = useQuery({
-        queryKey: [page,pageSize, JSON.stringify(filter)],
+        queryKey: [page, pageSize, JSON.stringify(filter)],
         queryFn: async () => await paging({ page, pageSize, filter }),
     });
 
@@ -32,7 +32,7 @@ export default function Home() {
         queryKey: ['categories'],
         queryFn: () => getCategory(),
     });
-    
+
     const deleteProductFn = async (id: number) => {
         const isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');
         if (!isConfirmed) return;
@@ -82,7 +82,7 @@ export default function Home() {
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
             <div className="text-right mb-4">
-                <Button 
+                <Button
                     onClick={() => router.push('/product/add')}
                     className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
                 >
@@ -111,28 +111,32 @@ export default function Home() {
                             <TableCell>{product.description}</TableCell>
                             <TableCell>
                                 <div className="flex gap-2 overflow-x-auto">
-                                    {product.images.split(',').map((imageUrl: string, imageIndex: number) => (
+                                    {/*chỉ lấy tấm hình đầu tiên
+                                    {product.images?.split(',').filter((x: any) => x).slice(0,1).map((imageUrl: string, imageIndex: number) => (*/}
+                                    {product.images?.split(',').filter((x: any) => x).map((imageUrl: string, imageIndex: number) => (
+                                    imageUrl && (
                                         <div key={imageIndex} className="relative min-w-[100px] h-[100px]">
                                             <Image
                                                 src={imageUrl}
                                                 alt={`${product.name} - ${imageIndex + 1}`}
-                                                fill
                                                 className="rounded-lg object-cover"
-                                                sizes="100px"
+                                                width={100}
+                                                height={100}
                                             />
-                                        </div>
+                                        </div>                                   
+                                        )
                                     ))}
                                 </div>
                             </TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
-                                    <Button 
-                                        className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent' 
+                                    <Button
+                                        className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent'
                                         variant={'outline'}
                                         onClick={() => router.push(`/product/edit/${product.id}`)}                          >
                                         {t('action.edit')}
                                     </Button>
-                                    <Button 
+                                    <Button
                                         className='bg-slate-500 text-white hover:bg-white hover:text-slate-500 hover:border-slate-500 border border-transparent'
                                         variant={'outline'}
                                         onClick={() => deleteProductFn(product.id)}
@@ -180,26 +184,26 @@ export default function Home() {
                     </Button>
 
                     {data?.totalPage && getPageNumbers(page, data.totalPage).map((pageNum, idx) => (
-            pageNum === '...' ? (
-              <div key={`ellipsis-${idx}`} className="w-9 h-9 flex items-center justify-center">
-                ...
-              </div>
-            ) : (
-              <Button
-                key={pageNum}
-                variant={pageNum === page ? "default" : "ghost"}
-                onClick={() => setPage(Number(pageNum))}
-                className={`
+                        pageNum === '...' ? (
+                            <div key={`ellipsis-${idx}`} className="w-9 h-9 flex items-center justify-center">
+                                ...
+                            </div>
+                        ) : (
+                            <Button
+                                key={pageNum}
+                                variant={pageNum === page ? "default" : "ghost"}
+                                onClick={() => setPage(Number(pageNum))}
+                                className={`
                   w-9 h-9 p-0
-                  ${pageNum === page 
-                    ? "bg-sky-900 text-white hover:none" 
-                    : "hover:bg-gray-300"}
+                  ${pageNum === page
+                                        ? "bg-sky-900 text-white hover:none"
+                                        : "hover:bg-gray-300"}
                 `}
-              >
-                {pageNum}
-              </Button>
-            )
-          ))}
+                            >
+                                {pageNum}
+                            </Button>
+                        )
+                    ))}
 
                     <Button
                         variant="outline"
@@ -212,7 +216,7 @@ export default function Home() {
                 </div>
 
                 <div>
-                    {data.pageSize*(data.page -1)+ 1} - {(data.pageSize*(data.page -1)) + data.data.length} {t('paging.of')} {data?.totalItem || 1}
+                    {data.pageSize * (data.page - 1) + 1} - {(data.pageSize * (data.page - 1)) + data.data.length} {t('paging.of')} {data?.totalItem || 1}
                 </div>
             </div>
         </div>
