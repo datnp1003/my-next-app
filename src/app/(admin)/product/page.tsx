@@ -14,12 +14,16 @@ import Image from 'next/image';
 
 export default function Home() {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const [search, setSearch] = useState('');
 
     const { t } = useTranslation('common');
     const router = useRouter();
     const [page, setPage] = useState(1);
     const [filter, setFilter] = useState({
         name: '',
+        description: '',
+        price: '',
+        categoryId: '', 
     });
 
     const [pageSize, setPageSize] = useState(10);
@@ -81,7 +85,30 @@ export default function Home() {
 
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
-            <div className="text-right mb-4">
+            {/* Thanh tìm kiếm */}
+            <div className="flex justify-between items-center mb-4">
+                <form
+                    onSubmit={e => {
+                        e.preventDefault();
+                        setFilter(f => ({ ...f, name: search, description: search, price: search }));
+                        setPage(1);
+                    }}
+                    className="flex gap-2"
+                >
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm sản phẩm..."
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        className="border border-gray-300 rounded px-3 py-2"
+                    />
+                    <Button
+                        type="submit"
+                        className="bg-sky-900 text-white"
+                    >
+                        Tìm kiếm
+                    </Button>
+                </form>
                 <Button
                     onClick={() => router.push('/product/add')}
                     className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
