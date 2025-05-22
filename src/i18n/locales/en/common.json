@@ -21,6 +21,15 @@
     "add_title": "Add Category",
     "edit_title": "Edit Category"
   },
+  "product": {
+    "name": "Name",
+    "price": "Price",
+    "images": "Images",
+    "description": "Description",
+    "category": "Category",
+    "add_title": "Add Product",
+    "edit_title": "Edit Product"
+  },
   "language_switcher": {
     "vi": "Vietnamese",
     "en": "English"
