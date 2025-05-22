@@ -30,13 +30,10 @@ export default function EditCategoryPage() {
       resolver: zodResolver(formSchema),
       defaultValues: {
         name: '',
-        email: '',
       },
     });
 
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   // Lấy thông tin category hiện tại
