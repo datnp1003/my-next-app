@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { deleteProduct, paging } from '@/core/domain/product/api';
 import { getCategory } from '@/core/domain/category/api';
 import { Category } from '@/core/domain/category/category.model';
+import Image from 'next/image';
 
 export default function Home() {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
@@ -108,7 +109,21 @@ export default function Home() {
                             <TableCell>{product.price}</TableCell>
                             <TableCell>{categoriesData?.find((cat: any) => cat.id === product.categoryId)?.name || '-'}</TableCell>
                             <TableCell>{product.description}</TableCell>
-                            <TableCell>{product.images}</TableCell>
+                            <TableCell>
+                                <div className="flex gap-2 overflow-x-auto">
+                                    {product.images.split(',').map((imageUrl: string, imageIndex: number) => (
+                                        <div key={imageIndex} className="relative min-w-[100px] h-[100px]">
+                                            <Image
+                                                src={imageUrl}
+                                                alt={`${product.name} - ${imageIndex + 1}`}
+                                                fill
+                                                className="rounded-lg object-cover"
+                                                sizes="100px"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
                                     <Button 

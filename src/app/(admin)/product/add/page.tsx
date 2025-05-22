@@ -13,7 +13,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import { createProduct } from '@/core/domain/product/api';
 import { getCategory } from '@/core/domain/category/api';
-import { Dropdown } from 'react-day-picker';
 import { Select, SelectGroup, SelectLabel } from '@radix-ui/react-select';
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
