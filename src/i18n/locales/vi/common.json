@@ -13,8 +13,14 @@
     "name": "Tên",
     "password": "Mật khẩu",
     "email": "Email",
-    "add_title": "Thêm người dùng"
+    "add_title": "Thêm người dùng",
+    "edit_title": "Sửa người dùng"
 
+  },
+  "category": {
+    "name": "Tên",
+    "add_title": "Thêm danh mục",
+    "edit_title": "Sửa danh mục"
   },
   "language_switcher": {
     "vi": "Tiếng Việt",
@@ -23,6 +29,7 @@
   "navbar": {
     "home": "Trang chủ",
     "user": "Quản lý người dùng",
+    "category": "Quản lý danh mục",
     "product": "Quản lý sản phẩm"
   },
   "action": {

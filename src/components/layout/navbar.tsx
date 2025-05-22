@@ -24,10 +24,14 @@ export default function Navbar() {
       title: t('navbar.user'),
       href: "/user",
       icon: UserCircle2
+    },{
+      title: t('navbar.category'),
+      href: "/category",
+      icon: Boxes
     },
     {
       title: t('navbar.product'),
-      href: "/upload",
+      href: "/product",
       icon: Boxes
     }
   ];

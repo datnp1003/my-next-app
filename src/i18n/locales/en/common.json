@@ -13,7 +13,13 @@
     "name": "Name",
     "password": "Password",
     "email": "Email",
-    "add_title": "Add User"
+    "add_title": "Add User",
+    "edit_title": "Edit User"
+  },
+  "category": {
+    "name": "Name",
+    "add_title": "Add Category",
+    "edit_title": "Edit Category"
   },
   "language_switcher": {
     "vi": "Vietnamese",
@@ -22,6 +28,7 @@
   "navbar": {
     "home": "Dashboard",
     "user": "User Management",
+    "category": "Category Management",
     "product": "Product Management"
   },
   "action": {
