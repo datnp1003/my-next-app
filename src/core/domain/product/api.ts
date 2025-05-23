@@ -53,3 +53,19 @@ export async function getProductById(id: number | string):Promise<Product> {
   const response = await api.get(`/product/${id}`);
   return response.data as Product;
 }
+
+//hàm get product by category
+export async function getProductByCategory1() {
+  const response = await api.get(`/product/skirt`);
+  return response.data as Product[];
+}
+
+export async function getProductByCategory2() {
+  const response = await api.get(`/product/dress`);
+  return response.data as Product[];
+}
+
+export async function getProductByCategory3() {
+  const response = await api.get(`/product/blouse`);
+  return response.data as Product[];
+}
