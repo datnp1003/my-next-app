@@ -10,6 +10,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
     const { data: session } = useSession();
     const pathname = usePathname();
 
+    if (pathname.startsWith('/client')) {
+        return children
+    }
+
     return (
         <>
             {session ? (

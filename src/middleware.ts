@@ -5,9 +5,14 @@ export async function middleware(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   const { pathname } = req.nextUrl;
+  // Redirect "/" to "/client"
+  if (pathname === '/') {
+    return NextResponse.redirect(new URL('/client', req.url));
+  }
 
   // Cho phép các public route
   if (
+    pathname.startsWith('/client') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/api/auth') ||
