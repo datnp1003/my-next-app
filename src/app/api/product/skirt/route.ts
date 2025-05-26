@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     try {
         const products = await prisma.product.findMany({
             where: {
-                categoryId: 2,
+                categoryId: 5,
             }
         });
 

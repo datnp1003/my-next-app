@@ -23,7 +23,7 @@ const LandingPage = () => {
       <div className="relative bg-gray-900 h-[600px]">
         <div className="absolute inset-0 overflow-hidden">
           <Image
-            src="/img/banner.jpg"
+            src="/img/banner2.jpg"
             alt="Hero background"
             fill
             priority
