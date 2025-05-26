@@ -12,6 +12,7 @@ generator client {
     email     String   @unique
     password  String
     name      String?
+    role      String     @default("USER")
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
   }
@@ -41,4 +42,13 @@ generator client {
   categoryId  Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+model Message {
+  id         Int        @id @default(autoincrement())
+  content    String
+  senderId   Int?       // null cho khách vãng lai
+  receiverId Int?       // null cho tin nhắn tới admin (khách vãng lai)
+  isBot      Boolean    @default(false) // Tin nhắn từ chatbot
+  createdAt  DateTime   @default(now())
 }

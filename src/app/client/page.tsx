@@ -1,4 +1,4 @@
-
+'use client';
 import React from 'react';
 import Image from 'next/image';
 import Header from '@/components/client/header';
@@ -7,16 +7,23 @@ import Product_Blouse from '@/components/client/product_blouse';
 import Product_Skirt from '@/components/client/product_skirt';
 import Product_Dress from '@/components/client/product_dress';
 import type { Metadata } from 'next';
+import Chat from '@/components/client/chat';
+import { useTranslation } from 'react-i18next';
+import { useSession } from 'next-auth/react';
 
-export const metadata: Metadata = {
-  title: 'Thời Trang Nữ Sang Trọng & Đẳng Cấp',
-  description: 'Khám phá bộ sưu tập thời trang nữ độc đáo và tinh tế. Tôn vinh vẻ đẹp phái nữ với những mẫu thời trang đẳng cấp.',
-  keywords: 'Thời trang nữ, thời trang cao cấp, sang trọng, đầm dự tiệc, áo dài'
-}
+// export const metadata: Metadata = {
+//   title: 'Thời Trang Nữ Sang Trọng & Đẳng Cấp',
+//   description: 'Khám phá bộ sưu tập thời trang nữ độc đáo và tinh tế. Tôn vinh vẻ đẹp phái nữ với những mẫu thời trang đẳng cấp.',
+//   keywords: 'Thời trang nữ, thời trang cao cấp, sang trọng, đầm dự tiệc, áo dài'
+// }
 
 const LandingPage = () => {
-
+  const { t } = useTranslation('common');
+  const { data: session } = useSession();
+  const userId = session ? session.user?.id : undefined;
+  const isAdmin = session?.user?.role === 'ADMIN';
   return (
+
     <div className="min-h-screen pt-16">{/* pt-16 to account for fixed header */}
       <Header />
       {/* Hero Section */}
@@ -60,6 +67,7 @@ const LandingPage = () => {
       <Product_Dress />
 
       <Footer />
+      <Chat userId={userId} isAdmin={isAdmin} />
     </div>
   );
 };

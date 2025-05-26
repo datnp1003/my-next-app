@@ -55,5 +55,12 @@
   "protected": {
     "title": "Welcome to the protected page",
     "content": "Hello"
+  },
+  "chat": {
+    "title": "Customer Support",
+    "placeholder": "Type a message...",
+    "send": "Send",
+    "no_messages": "No messages yet",
+    "admin_notification": "New message from customer"
   }
 }

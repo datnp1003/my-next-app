@@ -56,5 +56,12 @@
   "protected": {
     "title": "Welcome to the protected page",
     "content": "Xin chào"
+  },
+  "chat": {
+    "title": "Hỗ trợ khách hàng",
+    "placeholder": "Nhập tin nhắn...",
+    "send": "Gửi",
+    "no_messages": "Chưa có tin nhắn",
+    "admin_notification": "Tin nhắn mới từ khách hàng"
   }
 }
