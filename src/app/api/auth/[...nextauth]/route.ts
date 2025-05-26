@@ -23,7 +23,7 @@ export const authOptions = {
         if (!user || !bcrypt.compareSync(credentials.password, user.password)) {
           return null;
         }
-
+        console.log('User found:', user);
         // if (!user) {
         //   return null;
         // }
@@ -52,11 +52,17 @@ session: {
     async jwt({ token, user }: { token: any; user?: any }) {
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role; // Lưu role vào token nếu cần
       }
       return token;
     },
     async session({ session, token }: { session: any; token: any }) {
       session.user.id = token.id;
+      session.user.email = token.email;
+      session.user.name = token.name;
+      session.user.role = token.role; // Lưu role vào session nếu cần
       return session;
     },
   },

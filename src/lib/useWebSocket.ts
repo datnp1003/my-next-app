@@ -30,8 +30,9 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
     ws.onopen = () => {
       console.log('WebSocket connected');
     };
-
+    
     ws.onmessage = (event) => {
+      console.log('Message received:', event.data);
       const { type, data } = JSON.parse(event.data);
       if (type === 'message') {
         setMessages((prev) => [...prev, data]);
@@ -50,6 +51,7 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
   }, [isAdmin]);
 
   const sendMessage = (content: string) => {
+    console.log('Sending message:', wsRef.current);
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       const message = { userId, content, isAdmin, sessionId };
       wsRef.current.send(JSON.stringify(message));

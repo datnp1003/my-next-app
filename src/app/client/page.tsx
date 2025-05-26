@@ -20,6 +20,7 @@ import { useSession } from 'next-auth/react';
 const LandingPage = () => {
   const { t } = useTranslation('common');
   const { data: session } = useSession();
+  console.log('Session:', session);
   const userId = session ? session.user?.id : undefined;
   const isAdmin = session?.user?.role === 'ADMIN';
   return (

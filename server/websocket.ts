@@ -46,10 +46,10 @@ wss.on('connection', (ws: WebSocket) => {
       if (!client.isAdmin) {
         // Tin nhắn từ người dùng -> gửi tới admin
         const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-        receiverId = admin?.id;
+        receiverId = +(admin?.id ?? 0);
       } else {
         // Tin nhắn từ admin -> gửi tới người dùng (userId từ client)
-        receiverId = userId;
+        receiverId = +userId;
       }
 
       // Lưu tin nhắn vào cơ sở dữ liệu
