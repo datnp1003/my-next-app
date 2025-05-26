@@ -137,7 +137,7 @@ export default function Home() {
                             <TableCell>{categoriesData?.find((cat: any) => cat.id === product.categoryId)?.name || '-'}</TableCell>
                             <TableCell>{product.description}</TableCell>
                             <TableCell>
-                                <div className="flex gap-2 overflow-x-auto">
+                                <div className="flex gap-2 overflow-x-auto flex-shrink-0">
                                     {/*chỉ lấy tấm hình đầu tiên
                                     {product.images?.split(',').filter((x: any) => x).slice(0,1).map((imageUrl: string, imageIndex: number) => (*/}
                                     {product.images?.split(',').filter((x: any) => x).map((imageUrl: string, imageIndex: number) => (
@@ -147,8 +147,9 @@ export default function Home() {
                                                 src={imageUrl}
                                                 alt={`${product.name} - ${imageIndex + 1}`}
                                                 className="rounded-lg object-cover"
-                                                width={100}
-                                                height={100}
+                                                // width={100}
+                                                // height={100}
+                                                fill
                                             />
                                         </div>                                   
                                         )
