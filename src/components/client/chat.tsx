@@ -92,7 +92,7 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
                   <p
                     className={`inline-block p-2 rounded-lg ${
                       msg.senderId === userId || (!msg.senderId && !isAdmin)
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-sky-900 text-white'
                         : msg.isBot
                         ? 'bg-gray-200'
                         : 'bg-green-200'
