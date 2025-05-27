@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "ws": "ts-node server/websocket.ts"
+    "ws": "ts-node -P tsconfig.server.json server/websocket.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",

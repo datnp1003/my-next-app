@@ -24,13 +24,15 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
   };
 
   // Lọc tin nhắn liên quan đến người dùng hiện tại
-  const filteredMessages = messages.filter(
-    (msg) =>
-      msg.senderId === userId ||
-      msg.receiverId === userId ||
-      (!msg.senderId && !msg.receiverId && !isAdmin) ||
-      (isAdmin && (msg.receiverId === userId || msg.senderId === userId)),
-  );
+  // const filteredMessages = messages.filter(
+  //   (msg) =>
+  //     msg.senderId === userId ||
+  //     msg.receiverId === userId ||
+  //     (!msg.senderId && !msg.receiverId && !isAdmin) ||
+  //     (isAdmin && (msg.receiverId === userId || msg.senderId === userId)),
+  // );
+
+  const filteredMessages = messages;
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -38,7 +40,7 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
         onClick={() => setIsOpen(!isOpen)}
         className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600"
       >
-        {isOpen ? 'X' : 'Chat'}
+        {isOpen ? 'x' : 'Chat'}
       </button>
 
       {isOpen && (

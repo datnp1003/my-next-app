@@ -24,29 +24,57 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
   const sessionId = useRef<string>(uuidv4()).current;
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-    };
+    let ws: WebSocket;
     
-    ws.onmessage = (event) => {
-      console.log('Message received:', event.data);
-      const { type, data } = JSON.parse(event.data);
-      if (type === 'message') {
-        setMessages((prev) => [...prev, data]);
-      } else if (type === 'notification' && isAdmin) {
-        setNotifications((prev) => [...prev, data]);
-      }
-    };
+    try {
+      ws = new WebSocket('ws://localhost:8081');
+      wsRef.current = ws;
 
-    ws.onclose = () => {
-      console.log('WebSocket disconnected');
-    };
+      ws.onopen = () => {
+        console.log('WebSocket connected successfully');
+        // Gửi message test khi kết nối thành công
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+          console.log('Connection state:', wsRef.current.readyState);
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+      
+      ws.onmessage = (event) => {
+        try {
+          console.log('Raw message received:', event.data);
+          const { type, data } = JSON.parse(event.data);
+          console.log('Parsed message:', { type, data });
+          
+          if (type === 'message') {
+            setMessages((prev) => [...prev, data]);
+          } else if (type === 'notification' && isAdmin) {
+            setNotifications((prev) => [...prev, data]);
+          }
+        } catch (error) {
+          console.error('Error processing message:', error);
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean
+        });
+      };
+
+    } catch (error) {
+      console.error('Error creating WebSocket:', error);
+    }
 
     return () => {
-      ws.close();
+      if (ws) {
+        console.log('Cleaning up WebSocket connection');
+        ws.close();
+      }
     };
   }, [isAdmin]);
 
