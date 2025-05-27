@@ -48,14 +48,6 @@ const LandingPage = () => {
             >
               {t('home.hero.explore', 'Tìm hiểu thêm')}
             </a>
-            {!session && (
-              <a
-                href="/auth/signin"
-                className="inline-flex items-center px-6 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-gray-900 transition-all duration-300"
-              >
-                {t('home.hero.signin', 'Đăng nhập')}
-              </a>
-            )}
           </div>
         </div>
       </section>
@@ -72,7 +64,7 @@ const LandingPage = () => {
       <Footer />
       
       {/* Chat widget only shows for logged in users or admin */}
-      {(session || isAdmin) && <Chat userId={userId} isAdmin={isAdmin} />}
+      <Chat userId={userId} isAdmin={isAdmin} />
     </div>
   );
 };
