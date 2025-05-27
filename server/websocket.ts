@@ -1,8 +1,8 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { PrismaClient } from '@prisma/client';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
-const prisma = new PrismaClient();
+const API_URL = 'http://localhost:3000/api';
 const wss = new WebSocketServer({ port: 8081 });
 
 // Lưu trữ client với sessionId/userId và vai trò
@@ -44,23 +44,30 @@ wss.on('connection', (ws: WebSocket) => {
       // Xác định receiverId (admin hoặc người dùng)
       let receiverId: number | undefined;
       if (!client.isAdmin) {
-        // Tin nhắn từ người dùng -> gửi tới admin
-        const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-        receiverId = +(admin?.id ?? 0);
+        // Lấy thông tin admin qua API
+        const adminResponse = await axios.get(`${API_URL}/users/admin`);
+        receiverId = (adminResponse.data as { id: number }).id;
       } else {
         // Tin nhắn từ admin -> gửi tới người dùng (userId từ client)
         receiverId = +userId;
       }
 
-      // Lưu tin nhắn vào cơ sở dữ liệu
-      const message = await prisma.message.create({
-        data: {
-          content,
-          senderId: client.userId,
-          receiverId,
-          isBot: false,
-        },
+      // Lưu tin nhắn vào cơ sở dữ liệu qua API
+      const messageResponse = await axios.post(`${API_URL}/messages`, {
+        content,
+        senderId: client.userId,
+        receiverId,
+        isBot: false,
       });
+
+      const message = messageResponse.data as {
+        id: number;
+        content: string;
+        senderId: number;
+        receiverId: number;
+        isBot: boolean;
+        createdAt: string;
+      };
 
       // Gửi tin nhắn tới sender và receiver
       const messageData = {
@@ -104,14 +111,21 @@ wss.on('connection', (ws: WebSocket) => {
       // Chatbot phản hồi nếu là tin nhắn từ người dùng
       if (!client.isAdmin) {
         const botResponse = getBotResponse(content);
-        const botMessage = await prisma.message.create({
-          data: {
-            content: botResponse,
-            senderId: receiverId, // Admin gửi
-            receiverId: client.userId,
-            isBot: true,
-          },
+        const botMessageResponse = await axios.post(`${API_URL}/messages`, {
+          content: botResponse,
+          senderId: receiverId, // Admin gửi
+          receiverId: client.userId,
+          isBot: true,
         });
+
+        const botMessage = botMessageResponse.data as {
+          id: number;
+          content: string;
+          senderId: number;
+          receiverId: number;
+          isBot: boolean;
+          createdAt: string;
+        };
 
         const botMessageData = {
           id: botMessage.id,
