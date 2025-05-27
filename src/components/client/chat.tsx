@@ -39,7 +39,7 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-blue-500 text-white p-3 rounded-full shadow-lg hover:bg-blue-600"
+          className="bg-sky-900 text-white p-3 rounded-full shadow-lg hover:bg-sky-950 transition-colors flex items-center justify-center"
         >
           {/* You can put an icon or text here, e.g., "Chat" */}
           Chat
@@ -49,11 +49,11 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
       {isOpen && (
         <div className="bg-white w-80 h-96 rounded-lg shadow-lg flex flex-col mt-2">
           {/* Header */}
-          <div className="bg-blue-500 text-white p-3 rounded-t-lg flex justify-between items-center">
+          <div className="bg-sky-900 text-white p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-lg font-semibold">{t('chat.title')}</h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-blue-600 rounded-full p-1 transition-colors"
+              className="hover:bg-sky-950 rounded-full p-1 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +74,7 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
 
           {/* Notifications for admin */}
           {isAdmin && notifications.length > 0 && (
-            <div className="bg-yellow-100 p-2 text-sm text-yellow-800">
+            <div className="bg-gray-100 p-2 text-sm text-yellow-800">
               {notifications[notifications.length - 1].message}
             </div>
           )}
@@ -94,8 +94,8 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
                       msg.senderId === userId || (!msg.senderId && !isAdmin)
                         ? 'bg-blue-500 text-white'
                         : msg.isBot
-                        ? 'bg-green-200'
-                        : 'bg-gray-200'
+                        ? 'bg-gray-200'
+                        : 'bg-green-200'
                     }`}
                   >
                     {msg.content}
@@ -120,7 +120,7 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
               />
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                className="bg-sky-900 text-white px-4 py-2 rounded-md hover:bg-sky-950 transition-colors"
               >
                 {t('chat.send')}
               </button>
