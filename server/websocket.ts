@@ -45,8 +45,9 @@ wss.on('connection', (ws: WebSocket) => {
       let receiverId: number | undefined;
       if (!client.isAdmin) {
         // Lấy thông tin admin qua API
-        const adminResponse = await axios.get(`${API_URL}/users/admin`);
-        receiverId = (adminResponse.data as { id: number }).id;
+        // const adminResponse = await axios.get(`${API_URL}/users/admin`);
+        // receiverId = (adminResponse.data as { id: number }).id;
+        receiverId = 17;
       } else {
         // Tin nhắn từ admin -> gửi tới người dùng (userId từ client)
         receiverId = +userId;
@@ -77,9 +78,15 @@ wss.on('connection', (ws: WebSocket) => {
         receiverId: message.receiverId,
         isBot: message.isBot,
         createdAt: message.createdAt,
-      };
+      };      clients.forEach((c) => {
+        console.log('Checking client:', {
+          clientUserId: c.userId,
+          clientIsAdmin: c.isAdmin,
+          messageSenderId: message.senderId,
+          messageReceiverId: message.receiverId,
+          sessionId: c.sessionId
+        });
 
-      clients.forEach((c) => {
         if (
           c.ws.readyState === WebSocket.OPEN &&
           (c.userId === message.senderId ||
@@ -87,6 +94,7 @@ wss.on('connection', (ws: WebSocket) => {
             (!c.userId && c.sessionId === sessionId && !message.senderId) ||
             (c.isAdmin && message.receiverId === c.userId))
         ) {
+          console.log('Sending message to client:', messageData);
           c.ws.send(JSON.stringify({ type: 'message', data: messageData }));
         }
       });

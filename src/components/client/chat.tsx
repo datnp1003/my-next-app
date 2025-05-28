@@ -15,16 +15,14 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
   const { messages, notifications, sendMessage } = useWebSocket(userId, isAdmin);
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(false);
-
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8081');
-    ws.onmessage = (event) => {
-      const msg = JSON.parse(event.data);
-      if (isAdmin && msg.type === 'new_message' && msg.from === 'customer') {
+    if (isAdmin) {
+      const handleNewMessage = () => {
         onNewMessage?.();
-      }
-    };
-    return () => ws.close();
+      };
+      window.addEventListener('new_customer_message', handleNewMessage);
+      return () => window.removeEventListener('new_customer_message', handleNewMessage);
+    }
   }, [isAdmin, onNewMessage]);
 
   const handleSend = (e: React.FormEvent) => {
@@ -34,8 +32,16 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
       setInput('');
     }
   };
+  // const filteredMessages = messages
+  const filteredMessages = messages.filter(
+    (msg) =>
+      msg.senderId === userId ||
+      msg.receiverId === userId ||
+      (!msg.senderId && !msg.receiverId && !isAdmin) ||
+      (isAdmin && (msg.receiverId === userId || msg.senderId === userId)),
+  );
 
-  const filteredMessages = messages;
+console.log('Filtered messages:', filteredMessages);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -80,6 +86,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
             <div className="bg-gray-100 p-2 text-sm text-yellow-800">
               {notifications[notifications.length - 1].message}
             </div>
+            
           )}
 
           {/* Messages */}
