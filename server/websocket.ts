@@ -1,9 +1,12 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { getServerSession } from 'next-auth';
 
 const API_URL = 'http://localhost:3000/api';
 const wss = new WebSocketServer({ port: 8081 });
+
+const session = await getServerSession();
 
 // Lưu trữ client với sessionId/userId và vai trò
 interface Client {
@@ -45,8 +48,9 @@ wss.on('connection', (ws: WebSocket) => {
       let receiverId: number | undefined;
       if (!client.isAdmin) {
         // Lấy thông tin admin qua API
-        const adminResponse = await axios.get(`${API_URL}/users/admin`);
-        receiverId = (adminResponse.data as { id: number }).id;
+        // const adminResponse = await axios.get(`${API_URL}/users/admin`);
+        // receiverId = (adminResponse.data as { id: number }).id;
+        receiverId = (session as any).user?.id as unknown as number; // Giả sử lấy ID admin từ session
       } else {
         // Tin nhắn từ admin -> gửi tới người dùng (userId từ client)
         receiverId = +userId;
