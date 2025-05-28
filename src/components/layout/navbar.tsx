@@ -11,10 +11,16 @@ import {
 import { useTranslations } from '@/i18n/client';
 import Chat from '@/components/client/chat';
 import { useState, useEffect } from 'react';
+import { useSession } from "next-auth/react";
 
 export default function Navbar() {
   const { translate: t } = useTranslations('common');
   const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const userId = session?.user?.id;
+  const isAdmin = session?.user?.role === 'ADMIN';
+  console.log('userId', userId);
+  console.log('isAdmin', isAdmin);
 
   const menuItems = [
     {
@@ -26,7 +32,7 @@ export default function Navbar() {
       title: t('navbar.user'),
       href: "/user",
       icon: UserCircle2
-    },{
+    }, {
       title: t('navbar.category'),
       href: "/category",
       icon: Boxes
@@ -110,8 +116,8 @@ export default function Navbar() {
           </button>
           {/* Chat component */}
           <Chat
-            userId={1}
-            isAdmin={true}
+            userId={userId}
+            isAdmin={isAdmin}
             onNewMessage={() => setNewMessageCount(c => c + 1)}
           />
         </div>

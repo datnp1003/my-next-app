@@ -90,21 +90,11 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
               filteredMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`mb-2 ${
-                    msg.isBot
-                      ? 'text-left'
-                      : msg.senderId === userId || (!msg.senderId && !isAdmin)
-                      ? 'text-right'
-                      : 'text-left'
-                  }`}
+                  className={`mb-2 ${msg.isBot ? 'text-left' : 'text-right'}`}
                 >
                   <p
                     className={`inline-block p-2 rounded-lg ${
-                      msg.isBot
-                        ? 'bg-gray-200'
-                        : msg.senderId === userId || (!msg.senderId && !isAdmin)
-                        ? 'bg-sky-900 text-white'
-                        : 'bg-green-200'
+                      msg.isBot ? 'bg-gray-200' : 'bg-sky-900 text-white'
                     }`}
                   >
                     {msg.content}
