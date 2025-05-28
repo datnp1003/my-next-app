@@ -1,19 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useWebSocket } from '@/lib/useWebSocket';
 
 interface ChatProps {
   userId?: number;
   isAdmin?: boolean;
+  onNewMessage?: () => void;
 }
 
-export default function Chat({ userId, isAdmin = false }: ChatProps) {
+export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProps) {
   const { t } = useTranslation('common');
   const { messages, notifications, sendMessage } = useWebSocket(userId, isAdmin);
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8081');
+    ws.onmessage = (event) => {
+      const msg = JSON.parse(event.data);
+      if (isAdmin && msg.type === 'new_message' && msg.from === 'customer') {
+        onNewMessage?.();
+      }
+    };
+    return () => ws.close();
+  }, [isAdmin, onNewMessage]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,15 +34,6 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
       setInput('');
     }
   };
-
-  // Lọc tin nhắn liên quan đến người dùng hiện tại
-  // const filteredMessages = messages.filter(
-  //   (msg) =>
-  //     msg.senderId === userId ||
-  //     msg.receiverId === userId ||
-  //     (!msg.senderId && !msg.receiverId && !isAdmin) ||
-  //     (isAdmin && (msg.receiverId === userId || msg.senderId === userId)),
-  // );
 
   const filteredMessages = messages;
 
@@ -87,14 +90,20 @@ export default function Chat({ userId, isAdmin = false }: ChatProps) {
               filteredMessages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`mb-2 ${msg.senderId === userId || (!msg.senderId && !isAdmin) ? 'text-right' : 'text-left'}`}
+                  className={`mb-2 ${
+                    msg.isBot
+                      ? 'text-left'
+                      : msg.senderId === userId || (!msg.senderId && !isAdmin)
+                      ? 'text-right'
+                      : 'text-left'
+                  }`}
                 >
                   <p
                     className={`inline-block p-2 rounded-lg ${
-                      msg.senderId === userId || (!msg.senderId && !isAdmin)
-                        ? 'bg-sky-900 text-white'
-                        : msg.isBot
+                      msg.isBot
                         ? 'bg-gray-200'
+                        : msg.senderId === userId || (!msg.senderId && !isAdmin)
+                        ? 'bg-sky-900 text-white'
                         : 'bg-green-200'
                     }`}
                   >

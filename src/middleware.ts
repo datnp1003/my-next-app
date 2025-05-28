@@ -13,6 +13,7 @@ export async function middleware(req: NextRequest) {
   // Cho phép các public route
   if (
     pathname.startsWith('/client') ||
+    pathname.startsWith('/api/messages') ||
     pathname.startsWith('/login') ||
     pathname.startsWith('/register') ||
     pathname.startsWith('/api/auth') ||
