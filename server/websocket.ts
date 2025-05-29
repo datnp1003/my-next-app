@@ -36,7 +36,8 @@ wss.on('connection', (ws: WebSocket) => {
   console.log(`Client connected: ${sessionId}`);
 
   ws.on('message', async (data: string) => {
-    try {      
+    try {
+      console.log(JSON.parse(data))
       const { userId, content, isAdmin, receiverId: targetUserId } = JSON.parse(data);
       client.userId = userId ? parseInt(userId) : undefined;
       client.isAdmin = isAdmin || false;
@@ -45,15 +46,18 @@ wss.on('connection', (ws: WebSocket) => {
       let receiverId: number | undefined;
       if (!client.isAdmin) {
         // Nếu không phải admin, gửi tin nhắn cho admin
-        receiverId = 17; // ID của admin
-      } else {
+        receiverId = 1; // ID của admin
+      } 
+      
+      else {
         // Nếu là admin, gửi tin nhắn cho user được chọn
         receiverId = targetUserId ? parseInt(targetUserId.toString()) : undefined;
+        // receiverId = client.userId;
         console.log('Admin sending message to user:', receiverId);
       }
 
       // Lưu tin nhắn vào cơ sở dữ liệu qua API
-      
+
       const messageResponse = await axios.post(`${API_URL}/messages`, {
         content,
         senderId: client.userId,
@@ -78,9 +82,9 @@ wss.on('connection', (ws: WebSocket) => {
         receiverId: message.receiverId,
         isBot: message.isBot,
         createdAt: message.createdAt,
-      };      
-      
-      
+      };
+
+
       clients.forEach((c) => {
         console.log('Checking client:', {
           clientUserId: c.userId,
@@ -112,6 +116,7 @@ wss.on('connection', (ws: WebSocket) => {
                 data: {
                   message: `New message from user ${client.userId || 'guest'}`,
                   messageId: message.id,
+                  userId: client.userId
                 },
               }),
             );

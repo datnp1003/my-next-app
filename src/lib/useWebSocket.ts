@@ -15,6 +15,7 @@ interface Message {
 interface Notification {
   message: string;
   messageId: number;
+  userId:number;
 }
 
 export function useWebSocket(userId?: number, isAdmin: boolean = false) {

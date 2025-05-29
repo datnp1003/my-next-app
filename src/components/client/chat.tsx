@@ -10,6 +10,14 @@ interface ChatProps {
   onNewMessage?: () => void;
 }
 
+// interface Client {
+//   ws: WebSocket;
+//   sessionId: string;
+//   userId?: number;
+//   isAdmin: boolean;
+// }
+
+
 export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProps) {
   const { t } = useTranslation('common');
   const { messages, notifications, sendMessage } = useWebSocket(userId, isAdmin);
@@ -30,7 +38,9 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
     if (input.trim()) {
       if (isAdmin) {
         // Khi admin gửi tin nhắn, receiverId sẽ là userId của người dùng
-        sendMessage(input, 11);
+        // sendMessage(input, notifications[notifications.length - 1].userId);
+        const notiData = notifications?.length==0?undefined:notifications[notifications.length - 1]?.userId;
+        sendMessage(input, notiData);
       } else {
         sendMessage(input);
       }
@@ -62,7 +72,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
   console.log('Filtered messages:', filteredMessages);
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
+    <div>
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
@@ -75,6 +85,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
 
       {isOpen && (
         <div className="bg-white w-80 h-96 rounded-lg shadow-lg flex flex-col mt-2">
+
           {/* Header */}
           <div className="bg-sky-900 text-white p-3 rounded-t-lg flex justify-between items-center">
             <h3 className="text-lg font-semibold">{t('chat.title')}</h3>

@@ -10,6 +10,7 @@ import Product_Dress from '@/components/client/product_dress';
 import Chat from '@/components/client/chat';
 import { useTranslation } from 'react-i18next';
 import { useSession } from 'next-auth/react';
+import { ChatAI } from '@/components/client/chatAI';
 
 const LandingPage = () => {
   const { t } = useTranslation('common');
@@ -64,7 +65,10 @@ const LandingPage = () => {
       <Footer />
       
       {/* Chat widget only shows for logged in users or admin */}
-      <Chat userId={userId} isAdmin={isAdmin} />
+      <div className="fixed flex flex-col items-end gap-2 bottom-4 right-4 z-50">
+        <ChatAI />
+        <Chat userId={userId} isAdmin={isAdmin} />
+      </div>
     </div>
   );
 };
