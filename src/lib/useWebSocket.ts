@@ -76,11 +76,11 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
         ws.close();
       }
     };
-  }, [isAdmin]);
-  const sendMessage = (content: string) => {
+  }, [isAdmin]);  
+  const sendMessage = (content: string, receiverId?: number) => {
     console.log('Sending message:', wsRef.current?.readyState);
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      const message = { userId, content, isAdmin };
+      const message = { userId, content, isAdmin, receiverId };
       console.log('Sending:', message);
       wsRef.current.send(JSON.stringify(message));
     } else {

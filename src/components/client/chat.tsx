@@ -24,24 +24,28 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
       return () => window.removeEventListener('new_customer_message', handleNewMessage);
     }
   }, [isAdmin, onNewMessage]);
-
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      sendMessage(input);
+      if (isAdmin) {
+        // Khi admin gửi tin nhắn, receiverId sẽ là userId của người dùng
+        sendMessage(input, 11);
+      } else {
+        sendMessage(input);
+      }
       setInput('');
     }
   };
-  // const filteredMessages = messages
-  const filteredMessages = messages.filter(
-    (msg) =>
-      msg.senderId === userId ||
-      msg.receiverId === userId ||
-      (!msg.senderId && !msg.receiverId && !isAdmin) ||
-      (isAdmin && (msg.receiverId === userId || msg.senderId === userId)),
-  );
+  const filteredMessages = messages;
+  // const filteredMessages = messages.filter(
+  //   (msg) =>
+  //     msg.senderId === userId ||
+  //     msg.receiverId === userId ||
+  //     (!msg.senderId && !msg.receiverId && !isAdmin) ||
+  //     (isAdmin && (msg.receiverId === userId || msg.senderId === userId))
+  // );
 
-console.log('Filtered messages:', filteredMessages);
+  console.log('Filtered messages:', filteredMessages);
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -87,9 +91,7 @@ console.log('Filtered messages:', filteredMessages);
               {notifications[notifications.length - 1].message}
             </div>
             
-          )}
-
-          {/* Messages */}
+          )}          {/* Messages */}
           <div className="flex-1 p-3 overflow-y-auto">
             {filteredMessages.length === 0 ? (
               <p className="text-gray-500">{t('chat.no_messages')}</p>
@@ -110,8 +112,7 @@ console.log('Filtered messages:', filteredMessages);
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </p>
                 </div>
-              ))
-            )}
+              ))            )}
           </div>
 
           {/* Input form */}

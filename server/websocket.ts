@@ -78,7 +78,10 @@ wss.on('connection', (ws: WebSocket) => {
         receiverId: message.receiverId,
         isBot: message.isBot,
         createdAt: message.createdAt,
-      };      clients.forEach((c) => {
+      };      
+      
+      
+      clients.forEach((c) => {
         console.log('Checking client:', {
           clientUserId: c.userId,
           clientIsAdmin: c.isAdmin,
