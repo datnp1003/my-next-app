@@ -50,10 +50,12 @@ wss.on('connection', (ws: WebSocket) => {
         receiverId = 17;
       } else {
         // Tin nhắn từ admin -> gửi tới người dùng (userId từ client)
-        receiverId = +userId;
+        // receiverId = +userId;
+        receiverId = 11;
       }
 
       // Lưu tin nhắn vào cơ sở dữ liệu qua API
+      
       const messageResponse = await axios.post(`${API_URL}/messages`, {
         content,
         senderId: client.userId,

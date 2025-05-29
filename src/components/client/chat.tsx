@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'next-i18next';
 import { useWebSocket } from '@/lib/useWebSocket';
 
@@ -15,6 +15,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
   const { messages, notifications, sendMessage } = useWebSocket(userId, isAdmin);
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (isAdmin) {
       const handleNewMessage = () => {
@@ -35,15 +36,28 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
       }
       setInput('');
     }
-  };
+  };  
   const filteredMessages = messages;
-  // const filteredMessages = messages.filter(
-  //   (msg) =>
-  //     msg.senderId === userId ||
-  //     msg.receiverId === userId ||
-  //     (!msg.senderId && !msg.receiverId && !isAdmin) ||
-  //     (isAdmin && (msg.receiverId === userId || msg.senderId === userId))
-  // );
+
+  // Lọc tin nhắn dựa trên userId và vai trò admin
+  // const filteredMessages = messages.filter((msg) => {
+  //   if (isAdmin && userId) {
+  //     // Nếu là admin, chỉ hiển thị tin nhắn của cuộc hội thoại với user được chọn
+  //     return msg.senderId === userId || msg.receiverId === userId;
+  //   } else {
+  //     // Nếu là user thường, hiển thị tin nhắn của họ và tin nhắn từ admin gửi cho họ
+  //     return msg.senderId === userId || msg.receiverId === userId;
+  //   }
+  // });
+
+  // Auto scroll xuống cuối khi có tin nhắn mới
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [filteredMessages]);
 
   console.log('Filtered messages:', filteredMessages);
 
@@ -95,8 +109,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
           <div className="flex-1 p-3 overflow-y-auto">
             {filteredMessages.length === 0 ? (
               <p className="text-gray-500">{t('chat.no_messages')}</p>
-            ) : (
-              filteredMessages.map((msg) => (
+            ) : (              filteredMessages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`mb-2 ${msg.isBot ? 'text-left' : 'text-right'}`}
@@ -112,7 +125,9 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
                     {new Date(msg.createdAt).toLocaleTimeString()}
                   </p>
                 </div>
-              ))            )}
+              ))
+            )}
+            <div ref={messagesEndRef} /> {/* Điểm cuối để scroll tới */}
           </div>
 
           {/* Input form */}
