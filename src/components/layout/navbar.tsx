@@ -117,7 +117,7 @@ export default function Navbar() {
           {/* Chat component */}
           <Chat
             userId={userId}
-            isAdmin={isAdmin}
+            isAdmin={true}
             onNewMessage={() => setNewMessageCount(c => c + 1)}
           />
         </div>
