@@ -15,19 +15,19 @@ export function ChatAI() {
     setInput('');
     setLoading(true);
 
-    try {
-      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    try {      const res = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`
+        },
         body: JSON.stringify({
           model: "gpt-3.5-turbo",
           messages: [
             ...messages.map(m => ({ role: m.role, content: m.content })),
             { role: "user", content: input }
           ]
-        }),
+        })
       });
       const data = await res.json();
       const aiContent = data.choices?.[0]?.message?.content;
