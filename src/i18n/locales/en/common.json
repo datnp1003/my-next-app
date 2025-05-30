@@ -38,7 +38,8 @@
     "home": "Dashboard",
     "user": "User Management",
     "category": "Category Management",
-    "product": "Product Management"
+    "product": "Product Management",
+    "chat": "Customer Support"
   },
   "action": {
     "add": "Add",

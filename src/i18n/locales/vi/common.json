@@ -39,7 +39,8 @@
     "home": "Trang chủ",
     "user": "Quản lý người dùng",
     "category": "Quản lý danh mục",
-    "product": "Quản lý sản phẩm"
+    "product": "Quản lý sản phẩm",
+    "chat": "Hỗ trợ khách hàng"
   },
   "action": {
     "add": "Thêm",

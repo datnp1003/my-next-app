@@ -16,11 +16,11 @@ import { useSession } from "next-auth/react";
 export default function Navbar() {
   const { translate: t } = useTranslations('common');
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const userId = session?.user?.id;
-  const isAdmin = session?.user?.role === 'ADMIN';
-  console.log('userId', userId);
-  console.log('isAdmin', isAdmin);
+  // const { data: session, status } = useSession();
+  // const userId = session?.user?.id;
+  // const isAdmin = session?.user?.role === 'ADMIN';
+  // console.log('userId', userId);
+  // console.log('isAdmin', isAdmin);
 
   const menuItems = [
     {
@@ -41,6 +41,11 @@ export default function Navbar() {
       title: t('navbar.product'),
       href: "/product",
       icon: Boxes
+    },
+    {
+      title: t('navbar.chat'),
+      href: "/chat",
+      icon: Store
     }
   ];
 
@@ -96,9 +101,8 @@ export default function Navbar() {
           })}
         </ul>
       </div>
-      <div className="absolute bottom-6 left-0 w-full flex justify-center">
+      {/* <div className="absolute bottom-6 left-0 w-full flex justify-center">
         <div className="relative">
-          {/* Nút mở chat */}
           <button
             onClick={handleOpenChat}
             className="bg-sky-950 text-white rounded-full p-3 shadow-lg hover:bg-sky-800 transition relative"
@@ -107,21 +111,19 @@ export default function Navbar() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
             </svg>
-            {/* Badge thông báo tin nhắn mới */}
             {newMessageCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
                 {newMessageCount}
               </span>
             )}
           </button>
-          {/* Chat component */}
           <Chat
             userId={userId}
             isAdmin={true}
             onNewMessage={() => setNewMessageCount(c => c + 1)}
           />
         </div>
-      </div>
+      </div> */}
     </nav>
   );
 }
