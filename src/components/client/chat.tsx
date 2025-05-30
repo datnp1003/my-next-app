@@ -53,7 +53,7 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
       // Với admin, chỉ hiển thị tin nhắn của user được chọn
       if (!selectedUser) return [];
       return messages.filter(msg => 
-        msg.senderId === selectedUser || msg.receiverId === selectedUser
+        msg.senderId === selectedUser || msg.receiverId === selectedUser && msg.isBot === false
       );
     } else {
       // Với user thường, chỉ hiển thị tin nhắn của họ
