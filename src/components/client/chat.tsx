@@ -21,7 +21,7 @@ interface ChatProps {
 
 export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProps) {
   const { t } = useTranslation('common');
-  const { messages, notifications, sendMessage } = useWebSocket(userId, isAdmin);
+  const { messages, notifications, sendMessage, clearNotificationsForUser } = useWebSocket(userId, isAdmin);
   const [input, setInput] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
@@ -116,10 +116,13 @@ export default function Chat({ userId, isAdmin = false, onNewMessage }: ChatProp
                       name: `User #${id}`,
                       lastMessage: lastMessage?.content,
                       unreadCount,
-                      isOnline: true // TODO: Implement online status
+                      isOnline: true
                     };
                   })}
-                onSelectUser={id => setSelectedUser(id)}
+                onSelectUser={id => {
+                  setSelectedUser(id);
+                  clearNotificationsForUser(id); // Xóa notifications khi chọn user
+                }}
                 selectedUserId={selectedUser}
               />
             </div>

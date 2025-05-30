@@ -22,7 +22,13 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
-  const sessionId = useRef<string>(uuidv4()).current;  useEffect(() => {
+  const sessionId = useRef<string>(uuidv4()).current;
+
+  const clearNotificationsForUser = (userId: number) => {
+    setNotifications(prev => prev.filter(n => n.userId !== userId));
+  };
+
+  useEffect(() => {
     let ws: WebSocket;
     
     try {
@@ -89,5 +95,5 @@ export function useWebSocket(userId?: number, isAdmin: boolean = false) {
     }
   };
 
-  return { messages, notifications, sendMessage };
+  return { messages, notifications, sendMessage, clearNotificationsForUser };
 }
