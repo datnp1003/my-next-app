@@ -46,7 +46,7 @@ wss.on('connection', (ws: WebSocket) => {
       let receiverId: number | undefined;
       if (!client.isAdmin) {
         // Nếu không phải admin, gửi tin nhắn cho admin
-        receiverId = 1; // ID của admin
+        receiverId = 17; // ID của admin
       } 
       
       else {
