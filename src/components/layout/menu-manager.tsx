@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   DndContext,
   DragOverlay,
@@ -82,7 +82,21 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedMenus, setSelectedMenus] = useState<MenuItem[]>(currentMenuItems);
-  const [availableMenus, setAvailableMenus] = useState<MenuItem[]>(availableDefaultMenus);
+  
+  // Lọc bỏ những menu đã có trong selectedMenus
+  const filteredAvailableMenus = availableDefaultMenus.filter(availableItem => 
+    !selectedMenus.some(selectedItem => selectedItem.href === availableItem.href)
+  );
+  
+  const [availableMenus, setAvailableMenus] = useState<MenuItem[]>(filteredAvailableMenus);
+
+  // Cập nhật availableMenus khi selectedMenus thay đổi
+  useEffect(() => {
+    const newAvailableMenus = availableDefaultMenus.filter(availableItem => 
+      !selectedMenus.some(selectedItem => selectedItem.href === availableItem.href)
+    );
+    setAvailableMenus(newAvailableMenus);
+  }, [selectedMenus]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
