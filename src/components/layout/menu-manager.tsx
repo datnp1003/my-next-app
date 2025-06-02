@@ -40,9 +40,10 @@ type MenuItem = {
 
 type MenuManagerProps = {
   currentMenuItems: MenuItem[];
+  onSave: (items: MenuItem[]) => void;
 };
 
-export default function MenuManager({ currentMenuItems }: MenuManagerProps) {
+export default function MenuManager({ currentMenuItems, onSave }: MenuManagerProps) {
   const { translate: t } = useTranslations('common');
   
   // Menu có sẵn được set cứng
@@ -153,66 +154,82 @@ export default function MenuManager({ currentMenuItems }: MenuManagerProps) {
     setActiveId(null);
   };
 
+  const handleSave = () => {
+    onSave(selectedMenus);
+  };
+
   return (
-    <div className="flex gap-4 p-4">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={handleDragCancel}
-      >
-        {/* Cột menu đã chọn bên trái */}
-        <div className="w-1/2 border rounded-lg p-4">
-          <h2 className="text-lg font-semibold mb-4">Menu đang hiển thị</h2>
-          <div className="min-h-[500px] border-2 border-dashed p-2 rounded border-gray-200">
-            <SortableContext
-              items={selectedMenus.map(item => item.id)}
-              id="selected"
-              strategy={verticalListSortingStrategy}
-            >
-              {selectedMenus.map((item) => (
-                <SortableItem key={item.id} id={item.id} item={item} />
-              ))}
-            </SortableContext>
-          </div>
-        </div>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Quản lý Menu</h1>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+        >
+          Lưu thay đổi
+        </button>
+      </div>
 
-        {/* Cột menu có sẵn bên phải */}
-        <div className="w-1/2 border rounded-lg p-4">
-          <h2 className="text-lg font-semibold mb-4">Menu có sẵn</h2>
-          <div className="min-h-[500px] border-2 border-dashed p-2 rounded border-gray-200">
-            <SortableContext
-              items={availableMenus.map(item => item.id)}
-              id="available"
-              strategy={verticalListSortingStrategy}
-            >
-              {availableMenus.map((item) => (
-                <SortableItem key={item.id} id={item.id} item={item} />
-              ))}
-            </SortableContext>
-          </div>
-        </div>
-
-        <DragOverlay>
-          {activeId ? (
-            <div className="flex items-center gap-2 p-3 mb-2 bg-white rounded shadow-lg border border-sky-500 select-none">
-              {(() => {
-                const item = [...selectedMenus, ...availableMenus].find(
-                  (item) => item.id === activeId
-                );
-                if (!item) return null;
-                return (
-                  <>
-                    <item.icon className="w-5 h-5" />
-                    <span>{item.title}</span>
-                  </>
-                );
-              })()}
+      <div className="flex gap-4">
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
+        >
+          {/* Cột menu đã chọn bên trái */}
+          <div className="w-1/2 border rounded-lg p-4">
+            <h2 className="text-lg font-semibold mb-4">Menu đang hiển thị</h2>
+            <div className="min-h-[500px] border-2 border-dashed p-2 rounded border-gray-200">
+              <SortableContext
+                items={selectedMenus.map(item => item.id)}
+                id="selected"
+                strategy={verticalListSortingStrategy}
+              >
+                {selectedMenus.map((item) => (
+                  <SortableItem key={item.id} id={item.id} item={item} />
+                ))}
+              </SortableContext>
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          </div>
+
+          {/* Cột menu có sẵn bên phải */}
+          <div className="w-1/2 border rounded-lg p-4">
+            <h2 className="text-lg font-semibold mb-4">Menu có sẵn</h2>
+            <div className="min-h-[500px] border-2 border-dashed p-2 rounded border-gray-200">
+              <SortableContext
+                items={availableMenus.map(item => item.id)}
+                id="available"
+                strategy={verticalListSortingStrategy}
+              >
+                {availableMenus.map((item) => (
+                  <SortableItem key={item.id} id={item.id} item={item} />
+                ))}
+              </SortableContext>
+            </div>
+          </div>
+
+          <DragOverlay>
+            {activeId ? (
+              <div className="flex items-center gap-2 p-3 mb-2 bg-white rounded shadow-lg border border-sky-500 select-none">
+                {(() => {
+                  const item = [...selectedMenus, ...availableMenus].find(
+                    (item) => item.id === activeId
+                  );
+                  if (!item) return null;
+                  return (
+                    <>
+                      <item.icon className="w-5 h-5" />
+                      <span>{item.title}</span>
+                    </>
+                  );
+                })()}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   );
 }

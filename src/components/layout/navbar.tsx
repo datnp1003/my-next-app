@@ -7,7 +7,10 @@ import {
   LayoutDashboard,
   Boxes,
   Store,
-  Settings
+  Settings,
+  FileBarChart,
+  Users,
+  ShoppingCart
 } from "lucide-react";
 import { useTranslations } from '@/i18n/client';
 import Chat from '@/components/client/chat';
@@ -15,42 +18,136 @@ import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import MenuManager from './menu-manager';
 
+// Map các tên icon sang component
+const iconMap: { [key: string]: any } = {
+  LayoutDashboard,
+  UserCircle2,
+  Boxes,
+  Store,
+  Settings,
+  FileBarChart,
+  Users,
+  ShoppingCart
+};
+
+type MenuItem = {
+  id: string;
+  title: string;
+  href: string;
+  icon: any;
+};
+
 export default function Navbar() {
   const { translate: t } = useTranslations('common');
   const pathname = usePathname();
   const [isManagingMenu, setIsManagingMenu] = useState(false);
-  // const { data: session, status } = useSession();
-  // const userId = session?.user?.id;
-  // const isAdmin = session?.user?.role === 'ADMIN';
-  // console.log('userId', userId);
-  // console.log('isAdmin', isAdmin);
-
-  const menuItems = [
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Default menu items khi chưa có dữ liệu từ DB
+  const defaultMenuItems: MenuItem[] = [
     {
+      id: 'menu-1',
       title: t('navbar.home'),
       href: "/dashboard",
       icon: LayoutDashboard
     },
     {
+      id: 'menu-2',
       title: t('navbar.user'),
       href: "/user",
       icon: UserCircle2
-    }, {
+    },
+    {
+      id: 'menu-3',
       title: t('navbar.category'),
       href: "/category",
       icon: Boxes
     },
     {
+      id: 'menu-4',
       title: t('navbar.product'),
       href: "/product",
       icon: Boxes
     },
     {
+      id: 'menu-5',
       title: t('navbar.chat'),
       href: "/chat",
       icon: Store
     }
   ];
+  
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
+
+  // Load menu từ database khi component mount
+  useEffect(() => {
+    const loadMenus = async () => {
+      try {
+        const response = await fetch('/api/menu');
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          // Chuyển đổi từ dữ liệu DB sang định dạng MenuItem
+          const loadedMenus = data.map(item => ({
+            id: item.menuId,
+            title: item.title,
+            href: item.href,
+            icon: iconMap[item.icon] // Chuyển tên icon thành component
+          }));
+          setMenuItems(loadedMenus);
+        }
+      } catch (error) {
+        console.error('Error loading menus:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenus();
+  }, []);
+
+  const handleSaveMenu = async (newMenuItems: MenuItem[]) => {
+    try {
+      const response = await fetch('/api/menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(
+          newMenuItems.map(item => ({
+            ...item,
+            // Đảm bảo icon được gửi đúng định dạng
+            icon: {
+              name: item.icon.name || item.icon.type?.name || 'Store'
+            }
+          }))
+        ),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save menu');
+      }
+
+      const savedMenus = await response.json();
+      
+      // Chuyển đổi savedMenus trở lại format MenuItem
+      const updatedMenus = savedMenus.map((item: any) => ({
+        id: item.menuId,
+        title: item.title,
+        href: item.href,
+        icon: iconMap[item.icon] // Chuyển icon string thành component
+      }));
+
+      // Cập nhật state và đóng menu manager
+      setMenuItems(updatedMenus);
+      setIsManagingMenu(false);
+    } catch (error) {
+      console.error('Error saving menus:', error);
+      // TODO: Thêm thông báo lỗi cho người dùng ở đây
+      alert('Có lỗi khi lưu menu. Vui lòng thử lại.');
+    }
+  };
 
   // State để lưu số lượng tin nhắn mới
   const [newMessageCount, setNewMessageCount] = useState(0);
@@ -87,10 +184,10 @@ export default function Navbar() {
               Đóng
             </button>
           </div>
-          <MenuManager currentMenuItems={menuItems.map((item, index) => ({
-            id: `current-menu-${index}`,
-            ...item
-          }))} />
+          <MenuManager 
+            currentMenuItems={menuItems} 
+            onSave={handleSaveMenu}
+          />
         </div>
       ) : (
         <nav className="w-64 h-screen bg-sky-900 shadow-sm flex flex-col relative">
