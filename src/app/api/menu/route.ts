@@ -25,30 +25,31 @@ export async function POST(req: Request) {
     const menuItems = await req.json();
 
     // Bắt đầu transaction
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // 1. Xóa tất cả menu cũ
       await tx.menu.deleteMany();
 
       // 2. Tạo menu mới với thứ tự
-      await tx.menu.createMany({
-        data: menuItems.map((item: any, index: number) => ({
-          menuId: item.id,
-          title: item.title,
-          href: item.href,
-          icon: item.icon.type?.name || item.icon.name || 'Store', // Lấy tên icon từ component
-          order: index,
-        })),
-      });
+      const savedMenus = await Promise.all(
+        menuItems.map(async (item: any, index: number) => {
+          const iconName = item.icon || 'Store';
+
+          return tx.menu.create({
+            data: {
+              menuId: item.id,
+              title: item.title,
+              href: item.href,
+              icon: iconName,
+              order: index,
+            },
+          });
+        })
+      );
+
+      return savedMenus;
     });
 
-    // Trả về menu đã được sắp xếp
-    const savedMenus = await prisma.menu.findMany({
-      orderBy: {
-        order: 'asc',
-      },
-    });
-
-    return NextResponse.json(savedMenus);
+    return NextResponse.json(result);
   } catch (error) {
     console.error('Error saving menus:', error);
     return NextResponse.json(

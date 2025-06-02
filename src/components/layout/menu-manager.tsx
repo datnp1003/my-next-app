@@ -125,17 +125,27 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
       const sourceItems = activeContainer === 'selected' ? selectedMenus : availableMenus;
       const destItems = activeContainer === 'selected' ? availableMenus : selectedMenus;
 
+      // Tìm item để di chuyển và giữ nguyên thông tin icon
       const itemToMove = sourceItems.find((item) => item.id === activeId);
       if (!itemToMove) return;
 
+      // Xóa item khỏi container nguồn
       const sourceNewItems = sourceItems.filter((item) => item.id !== activeId);
-      const destNewItems = [...destItems];
 
+      // Thêm item vào container đích
+      const destNewItems = [...destItems];
       const overIndex = destItems.findIndex((item) => item.id === overId);
+      
       if (overIndex >= 0) {
-        destNewItems.splice(overIndex, 0, itemToMove);
+        destNewItems.splice(overIndex, 0, {
+          ...itemToMove,
+          icon: itemToMove.icon // Giữ nguyên icon gốc
+        });
       } else {
-        destNewItems.push(itemToMove);
+        destNewItems.push({
+          ...itemToMove,
+          icon: itemToMove.icon // Giữ nguyên icon gốc
+        });
       }
 
       if (activeContainer === 'selected') {

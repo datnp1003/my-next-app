@@ -87,17 +87,17 @@ export default function Navbar() {
         const data = await response.json();
         
         if (Array.isArray(data) && data.length > 0) {
-          // Chuyển đổi từ dữ liệu DB sang định dạng MenuItem
           const loadedMenus = data.map(item => ({
             id: item.menuId,
             title: item.title,
             href: item.href,
-            icon: iconMap[item.icon] // Chuyển tên icon thành component
+            icon: iconMap[item.icon] || Store
           }));
           setMenuItems(loadedMenus);
         }
       } catch (error) {
         console.error('Error loading menus:', error);
+        setMenuItems(defaultMenuItems);
       } finally {
         setIsLoading(false);
       }
@@ -108,43 +108,41 @@ export default function Navbar() {
 
   const handleSaveMenu = async (newMenuItems: MenuItem[]) => {
     try {
+      const menuItemsToSave = newMenuItems.map(item => {
+        // Get icon type name directly
+        let iconName = '';
+        for (const [key, value] of Object.entries(iconMap)) {
+          if (value === item.icon) {
+            iconName = key;
+            break;
+          }
+        }
+
+        return {
+          id: item.id,
+          title: item.title,
+          href: item.href,
+          icon: iconName || 'Store'
+        };
+      });
+
       const response = await fetch('/api/menu', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(
-          newMenuItems.map(item => ({
-            ...item,
-            // Đảm bảo icon được gửi đúng định dạng
-            icon: {
-              name: item.icon.name || item.icon.type?.name || 'Store'
-            }
-          }))
-        ),
+        body: JSON.stringify(menuItemsToSave)
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to save menu');
+        throw new Error('Failed to save menu');
       }
 
-      const savedMenus = await response.json();
-      
-      // Chuyển đổi savedMenus trở lại format MenuItem
-      const updatedMenus = savedMenus.map((item: any) => ({
-        id: item.menuId,
-        title: item.title,
-        href: item.href,
-        icon: iconMap[item.icon] // Chuyển icon string thành component
-      }));
-
       // Cập nhật state và đóng menu manager
-      setMenuItems(updatedMenus);
+      setMenuItems(newMenuItems);
       setIsManagingMenu(false);
     } catch (error) {
       console.error('Error saving menus:', error);
-      // TODO: Thêm thông báo lỗi cho người dùng ở đây
       alert('Có lỗi khi lưu menu. Vui lòng thử lại.');
     }
   };
