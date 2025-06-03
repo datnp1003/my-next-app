@@ -45,6 +45,7 @@ export default function Navbar() {
   const [isManagingMenu, setIsManagingMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
+  const [selectedRole, setSelectedRole] = useState<Role>((session?.user?.role as Role) || 'ADMIN');
 
   const isAdmin = session?.user?.role === 'ADMIN';
   
@@ -88,11 +89,12 @@ export default function Navbar() {
   useEffect(() => {
     const loadMenus = async () => {
       try {
-        const role = session?.user?.role || 'ADMIN';
+        const role = isAdmin ? selectedRole : session?.user?.role || 'ADMIN';
         const response = await fetch(`/api/menu?role=${role}`);
         const data = await response.json();
         
-        if (Array.isArray(data) && data.length > 0) {          const loadedMenus = data.map(item => ({
+        if (Array.isArray(data) && data.length > 0) {
+          const loadedMenus = data.map(item => ({
             id: item.menuId.replace(`${role}-`, ''), // Remove role prefix from menuId
             title: item.title,
             href: item.href,
@@ -109,7 +111,7 @@ export default function Navbar() {
     };
 
     loadMenus();
-  }, [session]);
+  }, [session, selectedRole, isAdmin]);
 
   const handleSaveMenu = async (newMenuItems: MenuItem[], role: Role) => {
     try {
@@ -180,7 +182,8 @@ export default function Navbar() {
             >
               Đóng
             </button>
-          </div>          <MenuManager 
+          </div>          
+          <MenuManager 
             currentMenuItems={menuItems} 
             onSave={handleSaveMenu as (items: MenuItem[], role: Role) => void}
           />
@@ -188,17 +191,30 @@ export default function Navbar() {
       ) : (
         <nav className="w-64 h-screen bg-sky-900 shadow-sm flex flex-col relative">
           <div className="border-b border-sky-800">
-            <div className="flex items-center justify-between h-16 px-4">
+            <div className="flex items-center h-16 px-4">
               <Store className="w-10 h-10 text-white" />
-              {isAdmin && (
-                <button
-                  onClick={() => setIsManagingMenu(true)}
-                  className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
-                  title="Quản lý menu"
-                >
-                  <Settings className="w-5 h-5" />
-                </button>
-              )}
+              <div className="flex items-center gap-2 ml-2">
+                {isAdmin && (
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value as Role)}
+                    className="px-2 py-1 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
+                  >
+                    <option value="ADMIN">Admin</option>
+                    <option value="SALES">Sales</option>
+                    <option value="WAREHOUSE">Warehouse</option>
+                  </select>
+                )}
+                {isAdmin && (
+                  <button
+                    onClick={() => setIsManagingMenu(true)}
+                    className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
+                    title="Quản lý menu"
+                  >
+                    <Settings className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex-1 p-4">
