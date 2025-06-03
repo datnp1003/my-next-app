@@ -37,11 +37,16 @@ type MenuItem = {
   icon: any;
 };
 
+type Role = 'ADMIN' | 'SALES' | 'WAREHOUSE';
+
 export default function Navbar() {
   const { translate: t } = useTranslations('common');
   const pathname = usePathname();
   const [isManagingMenu, setIsManagingMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { data: session } = useSession();
+
+  const isAdmin = session?.user?.role === 'ADMIN';
   
   // Default menu items khi chưa có dữ liệu từ DB
   const defaultMenuItems: MenuItem[] = [
@@ -79,16 +84,16 @@ export default function Navbar() {
   
   const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
 
-  // Load menu từ database khi component mount
+  // Load menu from database when component mounts
   useEffect(() => {
     const loadMenus = async () => {
       try {
-        const response = await fetch('/api/menu');
+        const role = session?.user?.role || 'ADMIN';
+        const response = await fetch(`/api/menu?role=${role}`);
         const data = await response.json();
         
-        if (Array.isArray(data) && data.length > 0) {
-          const loadedMenus = data.map(item => ({
-            id: item.menuId,
+        if (Array.isArray(data) && data.length > 0) {          const loadedMenus = data.map(item => ({
+            id: item.menuId.replace(`${role}-`, ''), // Remove role prefix from menuId
             title: item.title,
             href: item.href,
             icon: iconMap[item.icon] || Store
@@ -104,9 +109,9 @@ export default function Navbar() {
     };
 
     loadMenus();
-  }, []);
+  }, [session]);
 
-  const handleSaveMenu = async (newMenuItems: MenuItem[]) => {
+  const handleSaveMenu = async (newMenuItems: MenuItem[], role: Role) => {
     try {
       const menuItemsToSave = newMenuItems.map(item => {
         // Get icon type name directly
@@ -131,12 +136,17 @@ export default function Navbar() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(menuItemsToSave)
+        body: JSON.stringify({
+          menuItems: menuItemsToSave,
+          role: role
+        })
       });
 
       if (!response.ok) {
         throw new Error('Failed to save menu');
       }
+
+      const result = await response.json();
 
       // Cập nhật state và đóng menu manager
       setMenuItems(newMenuItems);
@@ -150,20 +160,9 @@ export default function Navbar() {
   // State để lưu số lượng tin nhắn mới
   const [newMessageCount, setNewMessageCount] = useState(0);
 
-  // Lắng nghe sự kiện tin nhắn mới (giả sử bạn có WebSocket hoặc polling)
+  // Lắng nghe sự kiện tin nhắn mới
   useEffect(() => {
-    // Giả lập: mỗi 10s tăng 1 tin nhắn mới (bạn thay bằng logic thực tế)
-    // Xóa đoạn này khi dùng WebSocket thực
-    // const interval = setInterval(() => setNewMessageCount(c => c + 1), 10000);
-    // return () => clearInterval(interval);
-
-    // Nếu dùng WebSocket:
-    // ws.onmessage = (event) => {
-    //   const msg = JSON.parse(event.data);
-    //   if (msg.type === 'new_message_from_customer') {
-    //     setNewMessageCount(c => c + 1);
-    //   }
-    // }
+    // Your existing message handling code...
   }, []);
 
   // Khi mở chat, reset thông báo
@@ -181,10 +180,9 @@ export default function Navbar() {
             >
               Đóng
             </button>
-          </div>
-          <MenuManager 
+          </div>          <MenuManager 
             currentMenuItems={menuItems} 
-            onSave={handleSaveMenu}
+            onSave={handleSaveMenu as (items: MenuItem[], role: Role) => void}
           />
         </div>
       ) : (
@@ -192,13 +190,15 @@ export default function Navbar() {
           <div className="border-b border-sky-800">
             <div className="flex items-center justify-between h-16 px-4">
               <Store className="w-10 h-10 text-white" />
-              <button
-                onClick={() => setIsManagingMenu(true)}
-                className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
-                title="Quản lý menu"
-              >
-                <Settings className="w-5 h-5" />
-              </button>
+              {isAdmin && (
+                <button
+                  onClick={() => setIsManagingMenu(true)}
+                  className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
+                  title="Quản lý menu"
+                >
+                  <Settings className="w-5 h-5" />
+                </button>
+              )}
             </div>
           </div>
           <div className="flex-1 p-4">
@@ -224,29 +224,6 @@ export default function Navbar() {
               })}
             </ul>
           </div>
-          {/* <div className="absolute bottom-6 left-0 w-full flex justify-center">
-            <div className="relative">
-              <button
-                onClick={handleOpenChat}
-                className="bg-sky-950 text-white rounded-full p-3 shadow-lg hover:bg-sky-800 transition relative"
-                aria-label="Mở chat"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8s-9-3.582-9-8 4.03-8 9-8 9 3.582 9 8z" />
-                </svg>
-                {newMessageCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
-                    {newMessageCount}
-                  </span>
-                )}
-              </button>
-              <Chat
-                userId={userId}
-                isAdmin={true}
-                onNewMessage={() => setNewMessageCount(c => c + 1)}
-              />
-            </div>
-          </div> */}
         </nav>
       )}
     </div>

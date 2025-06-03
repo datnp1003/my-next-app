@@ -38,9 +38,11 @@ type MenuItem = {
   icon: any;
 };
 
+type Role = 'ADMIN' | 'SALES' | 'WAREHOUSE';
+
 type MenuManagerProps = {
   currentMenuItems: MenuItem[];
-  onSave: (items: MenuItem[]) => void;
+  onSave: (items: MenuItem[], role: Role) => void;
 };
 
 export default function MenuManager({ currentMenuItems, onSave }: MenuManagerProps) {
@@ -82,6 +84,7 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedMenus, setSelectedMenus] = useState<MenuItem[]>(currentMenuItems);
+  const [selectedRole, setSelectedRole] = useState<Role>('ADMIN');
   
   // Lọc bỏ những menu đã có trong selectedMenus
   const filteredAvailableMenus = availableDefaultMenus.filter(availableItem => 
@@ -179,13 +182,24 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
   };
 
   const handleSave = () => {
-    onSave(selectedMenus);
+    onSave(selectedMenus, selectedRole);
   };
 
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex justify-between items-center">
-        <h1 className="text-xl font-bold">Quản lý Menu</h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold">Quản lý Menu</h1>
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value as Role)}
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+          >
+            <option value="ADMIN">Quản trị viên</option>
+            <option value="SALES">Nhân viên bán hàng</option>
+            <option value="WAREHOUSE">Nhân viên kho</option>
+          </select>
+        </div>
         <button
           onClick={handleSave}
           className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
