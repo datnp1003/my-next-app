@@ -228,7 +228,7 @@ export default function Navbar() {
           <nav
             className={`${
               isNavOpen ? "translate-x-0" : "-translate-x-full"
-            } transform md:translate-x-0 transition-transform duration-200 ease-in-out fixed md:relative w-64 h-screen bg-sky-900 shadow-sm flex flex-col z-50`}
+            } transform md:translate-x-0 transition-transform duration-200 ease-in-out fixed md:sticky top-0 left-0 w-64 h-screen bg-sky-900 shadow-sm flex flex-col z-50`}
           >
             {/* Close button for mobile */}
             {isMobile && (
@@ -268,7 +268,7 @@ export default function Navbar() {
                 </div>
               </div>
             </div>
-            <div className="flex-1 p-4 overflow-y-auto">
+            <div className="flex-1 overflow-y-auto p-4">
               <ul className="space-y-2">
                 {menuItems.map((item) => {
                   const isActive = pathname === item.href;
