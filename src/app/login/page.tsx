@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (session) {
-      router.push('/user');
+      router.push('/dashboard');
     }
   }, [session, router]);
 

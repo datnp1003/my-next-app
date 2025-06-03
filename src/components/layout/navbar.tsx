@@ -10,13 +10,16 @@ import {
   Settings,
   FileBarChart,
   Users,
-  ShoppingCart
+  ShoppingCart,
+  Menu as MenuIcon,
+  X
 } from "lucide-react";
 import { useTranslations } from '@/i18n/client';
 import Chat from '@/components/client/chat';
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 import MenuManager from './menu-manager';
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Map các tên icon sang component
 const iconMap: { [key: string]: any } = {
@@ -46,6 +49,8 @@ export default function Navbar() {
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
   const [selectedRole, setSelectedRole] = useState<Role>((session?.user?.role as Role) || 'ADMIN');
+  const [isNavOpen, setIsNavOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const isAdmin = session?.user?.role === 'ADMIN';
   
@@ -84,6 +89,14 @@ export default function Navbar() {
   ];
   
   const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
+
+  useEffect(() => {
+    if (!isMobile) {
+      setIsNavOpen(true);
+    } else {
+      setIsNavOpen(false);
+    }
+  }, [isMobile]);
 
   // Load menu from database when component mounts
   useEffect(() => {
@@ -170,6 +183,10 @@ export default function Navbar() {
   // Khi mở chat, reset thông báo
   const handleOpenChat = () => setNewMessageCount(0);
 
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+  };
+
   return (
     <div className="relative">
       {isManagingMenu ? (
@@ -189,58 +206,94 @@ export default function Navbar() {
           />
         </div>
       ) : (
-        <nav className="w-64 h-screen bg-sky-900 shadow-sm flex flex-col relative">
-          <div className="border-b border-sky-800">
-            <div className="flex items-center h-16 px-4">
-              <Store className="w-10 h-10 text-white" />
-              <div className="flex items-center gap-2 ml-2">
-                {isAdmin && (
-                  <select
-                    value={selectedRole}
-                    onChange={(e) => setSelectedRole(e.target.value as Role)}
-                    className="px-2 py-1 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
-                  >
-                    <option value="ADMIN">Admin</option>
-                    <option value="SALES">Sales</option>
-                    <option value="WAREHOUSE">Warehouse</option>
-                  </select>
-                )}
-                {isAdmin && (
-                  <button
-                    onClick={() => setIsManagingMenu(true)}
-                    className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
-                    title="Quản lý menu"
-                  >
-                    <Settings className="w-5 h-5" />
-                  </button>
-                )}
+        <>
+          {/* Mobile Menu Button */}
+          <button
+            onClick={toggleNav}
+            className="md:hidden fixed top-4 left-4 z-50 p-2 bg-sky-900 text-white rounded-md hover:bg-sky-800"
+            aria-label={isNavOpen ? "Close menu" : "Open menu"}
+          >
+            {isNavOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+          </button>
+
+          {/* Backdrop for mobile */}
+          {isMobile && isNavOpen && (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setIsNavOpen(false)}
+            />
+          )}
+
+          {/* Navigation */}
+          <nav
+            className={`${
+              isNavOpen ? "translate-x-0" : "-translate-x-full"
+            } transform md:translate-x-0 transition-transform duration-200 ease-in-out fixed md:relative w-64 h-screen bg-sky-900 shadow-sm flex flex-col z-50`}
+          >
+            {/* Close button for mobile */}
+            {isMobile && (
+              <button
+                onClick={() => setIsNavOpen(false)}
+                className="md:hidden absolute top-4 right-4 p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+
+            <div className="border-b border-sky-800">
+              <div className="flex items-center h-16 px-4">
+                <Store className="w-10 h-10 text-white" />
+                <div className="flex items-center gap-2 ml-2">
+                  {isAdmin && (
+                    <select
+                      value={selectedRole}
+                      onChange={(e) => setSelectedRole(e.target.value as Role)}
+                      className="px-2 py-1 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
+                    >
+                      <option value="ADMIN">Admin</option>
+                      <option value="SALES">Sales</option>
+                      <option value="WAREHOUSE">Warehouse</option>
+                    </select>
+                  )}
+                  {isAdmin && (
+                    <button
+                      onClick={() => setIsManagingMenu(true)}
+                      className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
+                      title="Quản lý menu"
+                    >
+                      <Settings className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex-1 p-4">
-            <ul className="space-y-2">
-              {menuItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className={`
-                        flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
-                        ${isActive
-                          ? 'text-white bg-sky-950'
-                          : 'text-white hover:bg-sky-950 hover:text-white'}
-                      `}
-                    >
-                      {item.icon && <item.icon className="w-5 h-5" />}
-                      <span>{item.title}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        </nav>
+            <div className="flex-1 p-4 overflow-y-auto">
+              <ul className="space-y-2">
+                {menuItems.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        className={`
+                          flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
+                          ${isActive
+                            ? 'text-white bg-sky-950'
+                            : 'text-white hover:bg-sky-950 hover:text-white'}
+                        `}
+                        onClick={() => isMobile && setIsNavOpen(false)}
+                      >
+                        {item.icon && <item.icon className="w-5 h-5" />}
+                        <span>{item.title}</span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </nav>
+        </>
       )}
     </div>
   );
