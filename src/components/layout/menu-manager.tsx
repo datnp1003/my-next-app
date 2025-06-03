@@ -48,6 +48,18 @@ type MenuManagerProps = {
 export default function MenuManager({ currentMenuItems, onSave }: MenuManagerProps) {
   const { translate: t } = useTranslations('common');
   
+  // Map các tên icon sang component
+  const iconMap: { [key: string]: any } = {
+    LayoutDashboard,
+    UserCircle2,
+    Boxes,
+    Store,
+    Settings,
+    FileBarChart,
+    Users,
+    ShoppingCart
+  };
+  
   // Menu có sẵn được set cứng
   const availableDefaultMenus: MenuItem[] = [
     {
@@ -85,6 +97,7 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedMenus, setSelectedMenus] = useState<MenuItem[]>(currentMenuItems);
   const [selectedRole, setSelectedRole] = useState<Role>('ADMIN');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Lọc bỏ những menu đã có trong selectedMenus
   const filteredAvailableMenus = availableDefaultMenus.filter(availableItem => 
@@ -100,6 +113,36 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
     );
     setAvailableMenus(newAvailableMenus);
   }, [selectedMenus]);
+
+  // Load menu khi role thay đổi
+  useEffect(() => {
+    const loadMenuForRole = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/menu?role=${selectedRole}`);
+        const data = await response.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          const loadedMenus = data.map(item => ({
+            id: item.menuId.replace(`${selectedRole}-`, ''),
+            title: item.title,
+            href: item.href,
+            icon: iconMap[item.icon] || Store
+          }));
+          setSelectedMenus(loadedMenus);
+        } else {
+          setSelectedMenus([]); // Reset về rỗng nếu role chưa có menu
+        }
+      } catch (error) {
+        console.error('Error loading menus:', error);
+        setSelectedMenus([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenuForRole();
+  }, [selectedRole]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -185,6 +228,10 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
     onSave(selectedMenus, selectedRole);
   };
 
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRole(e.target.value as Role);
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4">
       <div className="flex justify-between items-center">
@@ -192,8 +239,9 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
           <h1 className="text-xl font-bold">Quản lý Menu</h1>
           <select
             value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as Role)}
+            onChange={handleRoleChange}
             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+            disabled={isLoading}
           >
             <option value="ADMIN">Quản trị viên</option>
             <option value="SALES">Nhân viên bán hàng</option>
@@ -202,9 +250,10 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
         </div>
         <button
           onClick={handleSave}
-          className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors"
+          className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors disabled:bg-gray-400"
+          disabled={isLoading}
         >
-          Lưu thay đổi
+          {isLoading ? 'Đang tải...' : 'Lưu thay đổi'}
         </button>
       </div>
 
@@ -218,17 +267,26 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
         >
           {/* Cột menu đã chọn bên trái */}
           <div className="w-1/2 border rounded-lg p-4">
-            <h2 className="text-lg font-semibold mb-4">Menu đang hiển thị</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Menu đang hiển thị
+              {isLoading && <span className="ml-2 text-sky-500">(Đang tải...)</span>}
+            </h2>
             <div className="min-h-[500px] border-2 border-dashed p-2 rounded border-gray-200">
-              <SortableContext
-                items={selectedMenus.map(item => item.id)}
-                id="selected"
-                strategy={verticalListSortingStrategy}
-              >
-                {selectedMenus.map((item) => (
-                  <SortableItem key={item.id} id={item.id} item={item} />
-                ))}
-              </SortableContext>
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  Đang tải menu...
+                </div>
+              ) : (
+                <SortableContext
+                  items={selectedMenus.map(item => item.id)}
+                  id="selected"
+                  strategy={verticalListSortingStrategy}
+                >
+                  {selectedMenus.map((item) => (
+                    <SortableItem key={item.id} id={item.id} item={item} />
+                  ))}
+                </SortableContext>
+              )}
             </div>
           </div>
 
