@@ -19,7 +19,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
-  const isClient = session?.user?.role === 'CLIENT';
+  const isClient = session?.user?.role === 'USER';
 
   useEffect(() => {
     if (session && isClient) {
