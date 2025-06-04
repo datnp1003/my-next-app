@@ -241,33 +241,40 @@ export default function Navbar() {
               </button>
             )}
 
-            <div className="border-b border-sky-800">
-              <div className="flex items-center h-16 px-4">
-                <Store className="w-10 h-10 text-white" />
-                <div className="flex items-center gap-2 ml-2">
-                  {isAdmin && (
-                    <select
-                      value={selectedRole}
-                      onChange={(e) => setSelectedRole(e.target.value as Role)}
-                      className="px-2 py-1 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
-                    >
-                      <option value="ADMIN">Admin</option>
-                      <option value="SALES">Sales</option>
-                      <option value="WAREHOUSE">Warehouse</option>
-                    </select>
-                  )}
-                  {isAdmin && (
-                    <button
-                      onClick={() => setIsManagingMenu(true)}
-                      className="p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
-                      title="Quản lý menu"
-                    >
-                      <Settings className="w-5 h-5" />
-                    </button>
-                  )}
-                </div>
+            {/* Icon Section */}
+            <div className="flex flex-col items-center pt-3">
+              <div className="flex justify-center items-center mb-4">
+                <Store className="w-12 h-12 text-white" />
               </div>
+              <div className="w-16 h-[1px] bg-sky-800/30"></div>
             </div>
+            
+            {/* Admin Controls Section */}
+            <div className="px-4 pb-5 border-b border-sky-800">
+              {isAdmin && (
+                <div className="flex flex-col gap-3">
+                  <select
+                    value={selectedRole}
+                    onChange={(e) => setSelectedRole(e.target.value as Role)}
+                    className="w-full px-3 py-2 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
+                  >
+                    <option value="ADMIN">Admin</option>
+                    <option value="SALES">Sales</option>
+                    <option value="WAREHOUSE">Warehouse</option>
+                  </select>
+                  <button
+                    onClick={() => setIsManagingMenu(true)}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-sky-800 hover:bg-sky-700 rounded-lg transition-colors"
+                    title="Quản lý menu"
+                  >
+                    <Settings className="w-5 h-5" />
+                    <span className="text-sm">Quản lý Menu</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Menu Items */}
             <div className="flex-1 overflow-y-auto p-4">
               <ul className="space-y-2">
                 {menuItems.map((item) => {

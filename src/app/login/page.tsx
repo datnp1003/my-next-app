@@ -19,9 +19,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   
+  const isClient = session?.user?.role === 'CLIENT';
 
   useEffect(() => {
-    if (session) {
+    if (session && isClient) {
+      router.push('/client');
+    }
+    else if (session && !isClient) {
       router.push('/dashboard');
     }
   }, [session, router]);
