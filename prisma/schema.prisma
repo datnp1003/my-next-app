@@ -61,6 +61,9 @@ model Menu {
   icon      String
   order     Int
   role      String?  // ADMIN, WAREHOUSE, SALES
+  canCreate Boolean  @default(false)
+  canUpdate Boolean  @default(false)
+  canDelete Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

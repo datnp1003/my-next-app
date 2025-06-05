@@ -26,9 +26,14 @@ export async function GET(req: Request) {
 }
 
 // POST /api/menu - Lưu danh sách menu
-export async function POST(req: Request) {  
+export async function POST(req: Request) {
   try {
     const { menuItems, role } = await req.json();
+    console.log('Received request:', {
+      role,
+      menuItemsCount: menuItems?.length,
+      menuItems: JSON.stringify(menuItems, null, 2)
+    });
 
     if (!role || !Array.isArray(menuItems)) {
       return NextResponse.json(
@@ -51,15 +56,36 @@ export async function POST(req: Request) {
         menuItems.map(async (item: any, index: number) => {
           const iconName = item.icon || 'Store';
           try {
+            console.log('Creating menu item:', {
+              menuId: item.menuId,
+              title: item.title,
+              href: item.href,
+              icon: iconName,
+              order: index,
+              role: role,
+              canCreate: item.canCreate,
+              canUpdate: item.canUpdate,
+              canDelete: item.canDelete,
+            });
+            // Validate input data
+            if (!item.menuId || !item.title || !item.href) {
+              throw new Error(`Missing required fields for menu item: ${JSON.stringify(item)}`);
+            }
+            const menuData = {
+              menuId: String(item.menuId),
+              title: item.title,
+              href: item.href,
+              icon: iconName,
+              order: index,
+              role: role,
+              canCreate: item.canCreate === true,
+              canUpdate: item.canUpdate === true,
+              canDelete: item.canDelete === true
+            };
+            console.log('Creating menu item with data:', JSON.stringify(menuData, null, 2));
+
             return await tx.menu.create({
-              data: {
-                menuId: item.id,
-                title: item.title,
-                href: item.href,
-                icon: iconName,
-                order: index,
-                role: role
-              },
+              data: menuData
             });
           } catch (err) {
             console.error(`Error creating menu item: ${item.id}`, err);
@@ -73,9 +99,16 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error saving menus:', error);
+    console.error('Error saving menus:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: 'Error saving menus', details: error instanceof Error ? error.message : String(error) },
+      {
+        error: 'Error saving menus',
+        message: error instanceof Error ? error.message : String(error),
+        type: error instanceof Error ? error.constructor.name : typeof error,
+      },
       { status: 500 }
     );
   }
