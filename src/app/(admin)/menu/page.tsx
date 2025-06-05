@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   DndContext,
   DragOverlay,
@@ -18,8 +19,8 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
+  useSortable
 } from '@dnd-kit/sortable';
-import { SortableItem } from './sortable-item';
 import {
   UserCircle2,
   LayoutDashboard,
@@ -28,9 +29,10 @@ import {
   Store,
   FileBarChart,
   Users,
-  ShoppingCart
+  ShoppingCart,
 } from "lucide-react";
 import { useTranslations } from '@/i18n/client';
+import { CSS } from '@dnd-kit/utilities';
 
 type MenuItem = {
   id: string;
@@ -41,10 +43,66 @@ type MenuItem = {
 
 type Role = 'ADMIN' | 'SALES' | 'WAREHOUSE';
 
-type MenuManagerProps = {
-  currentMenuItems: MenuItem[];
-  onSave: (items: MenuItem[], role: Role) => void;
+type SortableItemProps = {
+  id: string;
+  item: {
+    icon: any;
+    title: string;
+    href: string;
+  };
+  containerId?: string;
+  onReturnToAvailable?: (item: { id: string; title: string; href: string; icon: any }) => void;
 };
+
+function SortableItem({ id, item, containerId, onReturnToAvailable }: SortableItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  const handleReturn = () => {
+    if (onReturnToAvailable) {
+      onReturnToAvailable({ id, ...item });
+    }
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`
+        flex items-center justify-between gap-2 p-3 mb-2 bg-white rounded shadow-sm border select-none
+        ${isDragging ? 'opacity-50 shadow-lg border-sky-500' : 'border-gray-200'}
+        hover:bg-gray-50 transition-all
+      `}
+    >
+      <div {...attributes} {...listeners} className="flex items-center gap-2 flex-1 cursor-move">
+        <item.icon className="w-5 h-5" />
+        <span>{item.title}</span>
+      </div>
+      {containerId === 'selected' && (
+        <button
+          onClick={handleReturn}
+          className="p-1.5 text-gray-500 hover:text-red-500 hover:bg-gray-100 rounded-full transition-colors"
+          title="Trả về menu có sẵn"
+        >          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6L6 18"></path>
+            <path d="M6 6l12 12"></path>
+          </svg>
+        </button>
+      )}
+    </div>
+  );
+}
 
 function DroppableArea({ 
   id, 
@@ -90,9 +148,12 @@ function DroppableArea({
   );
 }
 
-export default function MenuManager({ currentMenuItems, onSave }: MenuManagerProps) {
+export default function MenuManagerPage() {
   const { translate: t } = useTranslations('common');
-  
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
+
   // Map các tên icon sang component
   const iconMap: { [key: string]: any } = {
     LayoutDashboard,
@@ -104,7 +165,7 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
     Users,
     ShoppingCart
   };
-  
+
   // Menu có sẵn được set cứng
   const availableDefaultMenus: MenuItem[] = [
     {
@@ -158,11 +219,38 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
   ];
 
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [selectedMenus, setSelectedMenus] = useState<MenuItem[]>(currentMenuItems);
+  const [selectedMenus, setSelectedMenus] = useState<MenuItem[]>([]);
   const [selectedRole, setSelectedRole] = useState<Role>('ADMIN');
-  const [isLoading, setIsLoading] = useState(false);
-    // Setup initial available menus
   const [availableMenus, setAvailableMenus] = useState<MenuItem[]>(availableDefaultMenus);
+
+  // Load menu khi role thay đổi
+  useEffect(() => {
+    const loadMenuForRole = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/menu?role=${selectedRole}`);
+        const data = await response.json();        
+        if (Array.isArray(data) && data.length > 0) {
+          const loadedMenus = data.map(item => ({
+            id: item.menuId,
+            title: item.title,
+            href: item.href,
+            icon: iconMap[item.icon] || Store
+          }));
+          setSelectedMenus(loadedMenus);
+        } else {
+          setSelectedMenus([]); // Reset về rỗng nếu role chưa có menu
+        }
+      } catch (error) {
+        console.error('Error loading menus:', error);
+        setSelectedMenus([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMenuForRole();
+  }, [selectedRole]);
 
   // Cập nhật availableMenus khi selectedMenus thay đổi
   useEffect(() => {
@@ -184,35 +272,6 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
     setAvailableMenus(newAvailableMenus);
   }, [selectedMenus]);
 
-  // Load menu khi role thay đổi
-  useEffect(() => {
-    const loadMenuForRole = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`/api/menu?role=${selectedRole}`);
-        const data = await response.json();        
-        if (Array.isArray(data) && data.length > 0) {
-          const loadedMenus = data.map(item => ({
-            id: item.menuId, // Giữ nguyên id gốc
-            title: item.title,
-            href: item.href,
-            icon: iconMap[item.icon] || Store
-          }));
-          setSelectedMenus(loadedMenus);
-        } else {
-          setSelectedMenus([]); // Reset về rỗng nếu role chưa có menu
-        }
-      } catch (error) {
-        console.error('Error loading menus:', error);
-        setSelectedMenus([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadMenuForRole();
-  }, [selectedRole]);
-
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -223,6 +282,7 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
   };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     
@@ -301,9 +361,52 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
 
   const handleDragCancel = () => {
     setActiveId(null);
-  };  const handleSave = () => {
-    // Lưu menu và role mà không thêm prefix
-    onSave(selectedMenus, selectedRole);
+  };
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      const menuItemsToSave = selectedMenus.map(item => {
+        // Get icon type name directly
+        let iconName = '';
+        for (const [key, value] of Object.entries(iconMap)) {
+          if (value === item.icon) {
+            iconName = key;
+            break;
+          }
+        }
+
+        return {
+          id: item.id,
+          title: item.title,
+          href: item.href,
+          icon: iconName || 'Store'
+        };
+      });
+
+      const response = await fetch('/api/menu', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          menuItems: menuItemsToSave,
+          role: selectedRole
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save menu');
+      }      
+      await response.json();
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 10);
+    } catch (error) {
+      console.error('Error saving menus:', error);
+      alert('Có lỗi khi lưu menu. Vui lòng thử lại.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -326,13 +429,12 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
             <option value="WAREHOUSE">Nhân viên kho</option>
           </select>
         </div>
-        <button
-          onClick={handleSave}
-          className="px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors disabled:bg-gray-400"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Đang tải...' : 'Lưu thay đổi'}
-        </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-sky-900 text-white rounded-lg border border-sky-900 hover:bg-white hover:text-sky-900 hover:border hover:border-sky-900 transition-colors"
+          >
+            Lưu thay đổi
+          </button>
       </div>
 
       <DndContext
@@ -351,7 +453,8 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
                 <div className="flex items-center justify-center h-full text-gray-500">
                   Đang tải menu...
                 </div>
-              ) : (                <DroppableArea 
+              ) : (
+                <DroppableArea 
                   id="selected" 
                   items={selectedMenus}
                   onReturnToAvailable={(item) => {
@@ -398,3 +501,5 @@ export default function MenuManager({ currentMenuItems, onSave }: MenuManagerPro
     </div>
   );
 }
+
+

@@ -15,10 +15,8 @@ import {
   X
 } from "lucide-react";
 import { useTranslations } from '@/i18n/client';
-import Chat from '@/components/client/chat';
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
-import MenuManager from './menu-manager';
 import { useIsMobile } from "@/hooks/use-mobile";
 
 // Map các tên icon sang component
@@ -45,15 +43,15 @@ type Role = 'ADMIN' | 'SALES' | 'WAREHOUSE';
 export default function Navbar() {
   const { translate: t } = useTranslations('common');
   const pathname = usePathname();
-  const [isManagingMenu, setIsManagingMenu] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { data: session } = useSession();
-  const [selectedRole, setSelectedRole] = useState<Role>((session?.user?.role as Role) || 'ADMIN');
+  const role = session?.user?.role as Role || 'ADMIN';
   const [isNavOpen, setIsNavOpen] = useState(false);
   const isMobile = useIsMobile();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const isAdmin = session?.user?.role === 'ADMIN';
+  const [selectedRole, setSelectedRole] = useState<Role>(role);
 
   useEffect(() => {
     if (!isMobile) {
@@ -62,13 +60,13 @@ export default function Navbar() {
       setIsNavOpen(false);
     }
   }, [isMobile]);
-
-  // Load menu from database when component mounts
   useEffect(() => {
+    // Load menu from database when component mounts
     const loadMenus = async () => {
       try {
-        const role = isAdmin ? selectedRole : session?.user?.role || 'ADMIN';
-        const response = await fetch(`/api/menu?role=${role}`);
+        // Nếu là ADMIN sẽ dùng selectedRole, ngược lại dùng role hiện tại của user
+        const roleToUse = isAdmin ? selectedRole : role;
+        const response = await fetch(`/api/menu?role=${roleToUse}`);
         const data = await response.json();
         
         if (Array.isArray(data) && data.length > 0) {
@@ -91,64 +89,7 @@ export default function Navbar() {
     };
 
     loadMenus();
-  }, [session, selectedRole, isAdmin]);
-
-  const handleSaveMenu = async (newMenuItems: MenuItem[], role: Role) => {
-    try {
-      const menuItemsToSave = newMenuItems.map(item => {
-        // Get icon type name directly
-        let iconName = '';
-        for (const [key, value] of Object.entries(iconMap)) {
-          if (value === item.icon) {
-            iconName = key;
-            break;
-          }
-        }
-
-        return {
-          id: item.id,
-          title: item.title,
-          href: item.href,
-          icon: iconName || 'Store'
-        };
-      });
-
-      const response = await fetch('/api/menu', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          menuItems: menuItemsToSave,
-          role: role
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save menu');
-      }
-
-      const result = await response.json();
-
-      // Cập nhật state và đóng menu manager
-      setMenuItems(newMenuItems);
-      setIsManagingMenu(false);
-    } catch (error) {
-      console.error('Error saving menus:', error);
-      alert('Có lỗi khi lưu menu. Vui lòng thử lại.');
-    }
-  };
-
-  // State để lưu số lượng tin nhắn mới
-  const [newMessageCount, setNewMessageCount] = useState(0);
-
-  // Lắng nghe sự kiện tin nhắn mới
-  useEffect(() => {
-    // Your existing message handling code...
-  }, []);
-
-  // Khi mở chat, reset thông báo
-  const handleOpenChat = () => setNewMessageCount(0);
+  }, [session, role, isAdmin, selectedRole]);
 
   const toggleNav = () => {
     setIsNavOpen(!isNavOpen);
@@ -156,71 +97,52 @@ export default function Navbar() {
 
   return (
     <div className="relative">
-      {isManagingMenu ? (
-        <div className="fixed inset-0 bg-white z-50">
-          <div className="flex items-center justify-between p-4 border-b">
-            <h1 className="text-xl font-bold">Quản lý Menu</h1>
-            <button 
-              onClick={() => setIsManagingMenu(false)}
-              className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Đóng
-            </button>
-          </div>          
-          <MenuManager 
-            currentMenuItems={menuItems} 
-            onSave={handleSaveMenu as (items: MenuItem[], role: Role) => void}
-          />
-        </div>
-      ) : (
-        <>
-          {/* Mobile Menu Button */}
+      {/* Mobile Menu Button */}
+      <button
+        onClick={toggleNav}
+        className="md:hidden fixed top-4 left-4 z-50 p-2 bg-sky-900 text-white rounded-md hover:bg-sky-800"
+        aria-label={isNavOpen ? "Close menu" : "Open menu"}
+      >
+        {isNavOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+      </button>
+
+      {/* Backdrop for mobile */}
+      {isMobile && isNavOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsNavOpen(false)}
+        />
+      )}
+
+      {/* Navigation */}
+      <nav
+        className={`${
+          isNavOpen ? "translate-x-0" : "-translate-x-full"
+        } transform md:translate-x-0 transition-transform duration-200 ease-in-out fixed md:sticky top-0 left-0 w-64 h-screen bg-sky-900 shadow-sm flex flex-col z-50`}
+      >
+        {/* Close button for mobile */}
+        {isMobile && (
           <button
-            onClick={toggleNav}
-            className="md:hidden fixed top-4 left-4 z-50 p-2 bg-sky-900 text-white rounded-md hover:bg-sky-800"
-            aria-label={isNavOpen ? "Close menu" : "Open menu"}
+            onClick={() => setIsNavOpen(false)}
+            className="md:hidden absolute top-4 right-4 p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
+            aria-label="Close menu"
           >
-            {isNavOpen ? <X className="w-6 h-6" /> : <MenuIcon className="w-6 h-6" />}
+            <X className="w-5 h-5" />
           </button>
+        )}
 
-          {/* Backdrop for mobile */}
-          {isMobile && isNavOpen && (
-            <div
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
-              onClick={() => setIsNavOpen(false)}
-            />
-          )}
-
-          {/* Navigation */}
-          <nav
-            className={`${
-              isNavOpen ? "translate-x-0" : "-translate-x-full"
-            } transform md:translate-x-0 transition-transform duration-200 ease-in-out fixed md:sticky top-0 left-0 w-64 h-screen bg-sky-900 shadow-sm flex flex-col z-50`}
-          >
-            {/* Close button for mobile */}
-            {isMobile && (
-              <button
-                onClick={() => setIsNavOpen(false)}
-                className="md:hidden absolute top-4 right-4 p-2 text-white hover:bg-sky-800 rounded-lg transition-colors"
-                aria-label="Close menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            )}
-
-            {/* Icon Section */}
-            <div className="flex flex-col items-center pt-3">
-              <div className="flex justify-center items-center mb-4">
-                <Store className="w-12 h-12 text-white" />
-              </div>
-              <div className="w-16 h-[1px] bg-sky-800/30"></div>
-            </div>
-            
-            {/* Admin Controls Section */}
-            <div className="px-4 pb-5 border-b border-sky-800">
-              {isAdmin && (
-                <div className="flex flex-col gap-3">
-                  <select
+        {/* Icon Section */}
+        <div className="flex flex-col items-center pt-3">
+          <div className="flex justify-center items-center mb-4">
+            <Store className="w-12 h-12 text-white" />
+          </div>
+          <div className="w-16 h-[1px] bg-sky-800/30"></div>
+        </div>
+        
+        {/* Admin Controls Section */}
+        {isAdmin && (
+          <div className="flex flex-col gap-4 px-4 pb-5 border-b border-sky-800">
+            <select
                     value={selectedRole}
                     onChange={(e) => setSelectedRole(e.target.value as Role)}
                     className="w-full px-3 py-2 text-sm bg-sky-800 text-white border border-sky-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-600"
@@ -228,47 +150,50 @@ export default function Navbar() {
                     <option value="ADMIN">Admin</option>
                     <option value="SALES">Sales</option>
                     <option value="WAREHOUSE">Warehouse</option>
-                  </select>
-                  <button
-                    onClick={() => setIsManagingMenu(true)}
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 text-white bg-sky-800 hover:bg-sky-700 rounded-lg transition-colors"
-                    title="Quản lý menu"
-                  >
-                    <Settings className="w-5 h-5" />
-                    <span className="text-sm">Quản lý Menu</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            </select>
+            <Link
+              href="/menu"
+              className="w-full flex items-center justify-center gap-2 px-3 py-3 text-white bg-sky-800 hover:bg-sky-700 rounded-lg transition-colors"
+              title="Quản lý menu"
+            >
+              <Settings className="w-5 h-5" />
+              <span className="text-sm">Quản lý Menu</span>
+            </Link>
+          </div>
+        )}
 
-            {/* Menu Items */}
-            <div className="flex-1 overflow-y-auto p-4">
-              <ul className="space-y-2">
-                {menuItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className={`
-                          flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
-                          ${isActive
-                            ? 'text-white bg-sky-950'
-                            : 'text-white hover:bg-sky-950 hover:text-white'}
-                        `}
-                        onClick={() => isMobile && setIsNavOpen(false)}
-                      >
-                        {item.icon && <item.icon className="w-5 h-5" />}
-                        <span>{item.title}</span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+        {/* Menu Items */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full text-white">
+              Đang tải menu...
             </div>
-          </nav>
-        </>
-      )}
+          ) : (
+            <ul className="space-y-2">
+              {menuItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={`
+                        flex items-center gap-2 px-4 py-3 rounded-lg transition-colors
+                        ${isActive
+                          ? 'text-white bg-sky-950'
+                          : 'text-white hover:bg-sky-950 hover:text-white'}
+                      `}
+                      onClick={() => isMobile && setIsNavOpen(false)}
+                    >
+                      {item.icon && <item.icon className="w-5 h-5" />}
+                      <span>{item.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      </nav>
     </div>
   );
 }
