@@ -9,18 +9,23 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { useTranslation } from 'react-i18next';
 import { deleteCategory, paging } from '@/core/domain/category/api';
 import { useMenuPermissions } from '@/hooks/use-menu-permissions';
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-    const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+    const { data: session } = useSession();
+    const userRole = session?.user?.role || 'SALES';
+    const permissions = useMenuPermissions(userRole);
     const { t } = useTranslation('common');
     const router = useRouter();
+    const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
     const [filter, setFilter] = useState({
         name: '',
     });
-    const [pageSize, setPageSize] = useState(10);
+    const { canCreate, canUpdate, canDelete } = permissions;
     const { data, isLoading, error, refetch } = useQuery({
-        queryKey: [page,pageSize, JSON.stringify(filter)],
+        queryKey: [page, pageSize, JSON.stringify(filter)],
         queryFn: async () => await paging({ page, pageSize, filter }),
     });
 
@@ -70,13 +75,11 @@ export default function Home() {
         return rangeWithDots;
     }
 
-    const { canCreate, canUpdate, canDelete } = useMenuPermissions('SALES');  // Replace 'SALES' with actual user role
-
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
             <div className="text-right mb-4">
                 {canCreate && (
-                    <Button 
+                    <Button
                         onClick={() => router.push('/category/add')}
                         className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
                     >
@@ -91,9 +94,9 @@ export default function Home() {
                         <TableHead className="w-[60%]">{t('category.name')}</TableHead>
                         <TableHead className="w-[20%]"></TableHead>
                     </TableRow>
-                </TableHeader>
+                </TableHeader>                
                 <TableBody>
-                    {data?.items.map((category: any, index: number) => (
+                    {data?.data?.map((category: any, index: number) => (
                         <TableRow key={category.id} className='border border-gray-300'>
                             <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
                             <TableCell>{category.name}</TableCell>
@@ -158,26 +161,26 @@ export default function Home() {
                     </Button>
 
                     {data?.totalPage && getPageNumbers(page, data.totalPage).map((pageNum, idx) => (
-            pageNum === '...' ? (
-              <div key={`ellipsis-${idx}`} className="w-9 h-9 flex items-center justify-center">
-                ...
-              </div>
-            ) : (
-              <Button
-                key={pageNum}
-                variant={pageNum === page ? "default" : "ghost"}
-                onClick={() => setPage(Number(pageNum))}
-                className={`
+                        pageNum === '...' ? (
+                            <div key={`ellipsis-${idx}`} className="w-9 h-9 flex items-center justify-center">
+                                ...
+                            </div>
+                        ) : (
+                            <Button
+                                key={pageNum}
+                                variant={pageNum === page ? "default" : "ghost"}
+                                onClick={() => setPage(Number(pageNum))}
+                                className={`
                   w-9 h-9 p-0
-                  ${pageNum === page 
-                    ? "bg-sky-900 text-white hover:none" 
-                    : "hover:bg-gray-300"}
+                  ${pageNum === page
+                                        ? "bg-sky-900 text-white hover:none"
+                                        : "hover:bg-gray-300"}
                 `}
-              >
-                {pageNum}
-              </Button>
-            )
-          ))}
+                            >
+                                {pageNum}
+                            </Button>
+                        )
+                    ))}
 
                     <Button
                         variant="outline"
@@ -187,10 +190,12 @@ export default function Home() {
                     >
                         <ChevronRight className="h-4 w-4" />
                     </Button>
-                </div>
-
-                <div>
-                    {data.pageSize*(data.page -1)+ 1} - {(data.pageSize*(data.page -1)) + data.data.length} {t('paging.of')} {data?.totalItem || 1}
+                </div>                <div>
+                    {data?.pageSize && data?.data ? (
+                        <>{data.pageSize * (data.page - 1) + 1} - {(data.pageSize * (data.page - 1)) + data.data.length} {t('paging.of')} {data?.totalItem || 0}</>
+                    ) : (
+                        <>0 - 0 {t('paging.of')} 0</>
+                    )}
                 </div>
             </div>
         </div>
