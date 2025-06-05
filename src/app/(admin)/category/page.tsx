@@ -8,10 +8,10 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTranslation } from 'react-i18next';
 import { deleteCategory, paging } from '@/core/domain/category/api';
+import { useMenuPermissions } from '@/hooks/use-menu-permissions';
 
 export default function Home() {
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
-
     const { t } = useTranslation('common');
     const router = useRouter();
     const [page, setPage] = useState(1);
@@ -70,56 +70,53 @@ export default function Home() {
         return rangeWithDots;
     }
 
+    const { canCreate, canUpdate, canDelete } = useMenuPermissions('SALES');  // Replace 'SALES' with actual user role
+
     return (
         <div className="container-fluid mx-auto p-5 bg-white rounded-lg shadow-md">
             <div className="text-right mb-4">
-                <Button 
-                    onClick={() => router.push('/category/add')}
-                    className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
-                >
-                    {t('action.add')}
-                </Button>
+                {canCreate && (
+                    <Button 
+                        onClick={() => router.push('/category/add')}
+                        className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
+                    >
+                        {t('action.add')}
+                    </Button>
+                )}
             </div>
             <Table className='border border-gray-300'>
                 <TableHeader>
                     <TableRow className='bg-sky-100 border border-gray-300 text-gray-700'>
                         <TableHead className="w-[20%]">No.</TableHead>
-                        <TableHead className="w-[60%] cursor-pointer hover:text-sky-950">{t('category.name')}
-                            {/* <Input
-                                    type="text"
-                                    placeholder="Tìm kiếm tên"
-                                    className="border border-gray-300 rounded p-1 w-full"
-                                    onChange={(e) => {
-                                        setFilter((prev) => ({
-                                            ...prev,
-                                            name: e.target.value,
-                                        }));
-                                    }}
-                                /> */}
-                        </TableHead>
+                        <TableHead className="w-[60%]">{t('category.name')}</TableHead>
                         <TableHead className="w-[20%]"></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.data?.map((category: any, index: number) => (
-                        <TableRow key={category.id} className={`border border-gray-300 text-gray-700 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                            <TableCell className="font-medium">{index + 1}</TableCell>
-                            <TableCell>{category.name || 'Không có tên'}</TableCell>
-                            <TableCell>
-                                <div className="flex gap-2">
-                                    <Button 
-                                        className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent' 
-                                        variant={'outline'}
-                                        onClick={() => router.push(`/category/edit/${category.id}`)}                          >
-                                        {t('action.edit')}
-                                    </Button>
-                                    <Button 
-                                        className='bg-slate-500 text-white hover:bg-white hover:text-slate-500 hover:border-slate-500 border border-transparent'
-                                        variant={'outline'}
-                                        onClick={() => deleteCategoryFn(category.id)}
-                                    >
-                                        {t('action.delete')}
-                                    </Button>
+                    {data?.items.map((category: any, index: number) => (
+                        <TableRow key={category.id} className='border border-gray-300'>
+                            <TableCell>{(page - 1) * pageSize + index + 1}</TableCell>
+                            <TableCell>{category.name}</TableCell>
+                            <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                    {canUpdate && (
+                                        <Button
+                                            onClick={() => router.push(`/category/edit/${category.id}`)}
+                                            className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
+                                            size="sm"
+                                        >
+                                            {t('action.edit')}
+                                        </Button>
+                                    )}
+                                    {canDelete && (
+                                        <Button
+                                            onClick={() => deleteCategoryFn(category.id)}
+                                            className='bg-red-600 text-white hover:bg-white hover:text-red-600 hover:border-red-600 border border-transparent'
+                                            size="sm"
+                                        >
+                                            {t('action.delete')}
+                                        </Button>
+                                    )}
                                 </div>
                             </TableCell>
                         </TableRow>
