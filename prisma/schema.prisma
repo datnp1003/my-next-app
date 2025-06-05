@@ -55,7 +55,7 @@ model Message {
 
 model Menu {
   id        Int      @id @default(autoincrement())
-  menuId    String   @unique
+  menuId    String   
   title     String
   href      String
   icon      String

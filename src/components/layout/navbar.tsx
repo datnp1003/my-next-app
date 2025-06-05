@@ -51,44 +51,9 @@ export default function Navbar() {
   const [selectedRole, setSelectedRole] = useState<Role>((session?.user?.role as Role) || 'ADMIN');
   const [isNavOpen, setIsNavOpen] = useState(false);
   const isMobile = useIsMobile();
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   const isAdmin = session?.user?.role === 'ADMIN';
-  
-  // Default menu items khi chưa có dữ liệu từ DB
-  const defaultMenuItems: MenuItem[] = [
-    {
-      id: 'menu-1',
-      title: t('navbar.home'),
-      href: "/dashboard",
-      icon: LayoutDashboard
-    },
-    {
-      id: 'menu-2',
-      title: t('navbar.user'),
-      href: "/user",
-      icon: UserCircle2
-    },
-    {
-      id: 'menu-3',
-      title: t('navbar.category'),
-      href: "/category",
-      icon: Boxes
-    },
-    {
-      id: 'menu-4',
-      title: t('navbar.product'),
-      href: "/product",
-      icon: Boxes
-    },
-    {
-      id: 'menu-5',
-      title: t('navbar.chat'),
-      href: "/chat",
-      icon: Store
-    }
-  ];
-  
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(defaultMenuItems);
 
   useEffect(() => {
     if (!isMobile) {
@@ -108,16 +73,18 @@ export default function Navbar() {
         
         if (Array.isArray(data) && data.length > 0) {
           const loadedMenus = data.map(item => ({
-            id: item.menuId.replace(`${role}-`, ''), // Remove role prefix from menuId
+            id: item.menuId,
             title: item.title,
             href: item.href,
             icon: iconMap[item.icon] || Store
           }));
           setMenuItems(loadedMenus);
+        } else {
+          setMenuItems([]); // Set empty array if no data
         }
       } catch (error) {
         console.error('Error loading menus:', error);
-        setMenuItems(defaultMenuItems);
+        setMenuItems([]); // Set empty array on error
       } finally {
         setIsLoading(false);
       }

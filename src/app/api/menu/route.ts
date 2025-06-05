@@ -50,13 +50,10 @@ export async function POST(req: Request) {
       const savedMenus = await Promise.all(
         menuItems.map(async (item: any, index: number) => {
           const iconName = item.icon || 'Store';
-          // Add role prefix to menuId to ensure uniqueness across roles
-          const uniqueMenuId = `${role}-${item.id}`;
-
           try {
             return await tx.menu.create({
               data: {
-                menuId: uniqueMenuId,
+                menuId: item.id,
                 title: item.title,
                 href: item.href,
                 icon: iconName,
@@ -65,7 +62,7 @@ export async function POST(req: Request) {
               },
             });
           } catch (err) {
-            console.error(`Error creating menu item: ${uniqueMenuId}`, err);
+            console.error(`Error creating menu item: ${item.id}`, err);
             throw err; // Re-throw to trigger transaction rollback
           }
         })
