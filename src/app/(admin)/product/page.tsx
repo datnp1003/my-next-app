@@ -11,8 +11,14 @@ import { deleteProduct, paging } from '@/core/domain/product/api';
 import { getCategory } from '@/core/domain/category/api';
 import { Category } from '@/core/domain/category/category.model';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useMenuPermissions } from '@/hooks/use-menu-permissions';
 
 export default function Home() {
+    const { data: session } = useSession();
+    const userRole = session?.user?.role || 'SALES';
+    const permissions = useMenuPermissions(userRole);
+    
     const [alert, setAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [search, setSearch] = useState('');
 
@@ -25,6 +31,8 @@ export default function Home() {
         price: '',
         categoryId: '', 
     });
+
+    const { canCreate, canUpdate, canDelete } = permissions;
 
     const [pageSize, setPageSize] = useState(10);
     const { data, isLoading, error, refetch } = useQuery({
@@ -109,12 +117,14 @@ export default function Home() {
                         Tìm kiếm
                     </Button>
                 </form>
+                { canCreate && (
                 <Button
                     onClick={() => router.push('/product/add')}
                     className='bg-sky-900 text-white hover:bg-white hover:text-sky-900 hover:border-sky-900 border border-transparent'
                 >
                     {t('action.add')}
                 </Button>
+                )}
             </div>
             <Table className='border border-gray-300'>
                 <TableHeader>
@@ -158,12 +168,15 @@ export default function Home() {
                             </TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
+                                    {canUpdate && (
                                     <Button
                                         className='bg-orange-500 text-white hover:bg-white hover:text-orange-500 hover:border-orange-500 border border-transparent'
                                         variant={'outline'}
                                         onClick={() => router.push(`/product/edit/${product.id}`)}                          >
                                         {t('action.edit')}
                                     </Button>
+                                    )}
+                                    {canDelete && (
                                     <Button
                                         className='bg-slate-500 text-white hover:bg-white hover:text-slate-500 hover:border-slate-500 border border-transparent'
                                         variant={'outline'}
@@ -171,6 +184,7 @@ export default function Home() {
                                     >
                                         {t('action.delete')}
                                     </Button>
+                                    )}
                                 </div>
                             </TableCell>
                         </TableRow>
