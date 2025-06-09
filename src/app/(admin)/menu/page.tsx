@@ -244,19 +244,19 @@ export default function MenuManagerPage() {
         {
             id: '6',
             title: 'Reports',
-            href: "/reports",
+            href: "/report",
             icon: FileBarChart
         },
         {
             id: '7',
             title: 'Customers',
-            href: "/customers",
+            href: "/customer",
             icon: Users
         },
         {
             id: '8',
             title: 'Orders',
-            href: "/orders",
+            href: "/order",
             icon: ShoppingCart
         }
     ];
