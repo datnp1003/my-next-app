@@ -66,12 +66,10 @@ export default function HelloPage() {
                             Clean and modern design principles
                         </p>
                     </div>                
-                </div>
-
-                {/* Content Section with 3:9 ratio */}
-                <div className="mt-16 grid grid-cols-12 gap-6">
+                </div>                {/* Content Section with 3:9 ratio */}
+                <div className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-6">
                     {/* Sidebar - spans 3 columns */}
-                    <div className="col-span-3 bg-white p-6 rounded-lg shadow-lg">
+                    <div className="col-span-1 md:col-span-3 bg-white p-6 rounded-lg shadow-lg">
                         <h3 className="text-lg font-semibold text-gray-800 mb-4">Sidebar</h3>
                         <ul className="space-y-2">
                             <li className="p-2 hover:bg-sky-50 rounded-md cursor-pointer transition-colors">
@@ -87,10 +85,8 @@ export default function HelloPage() {
                                 Menu Item 4
                             </li>
                         </ul>
-                    </div>
-
-                    {/* Main Content - spans 9 columns */}
-                    <div className="col-span-9 bg-white p-6 rounded-lg shadow-lg">
+                    </div>                    {/* Main Content - spans 9 columns */}
+                    <div className="col-span-1 md:col-span-9 bg-white p-6 rounded-lg shadow-lg">
                         <h2 className="text-2xl font-bold text-gray-800 mb-4">Main Content</h2>
                         <p className="text-gray-600 mb-4">
                             This is the main content area taking up 75% of the available space. You can add any content here
@@ -99,8 +95,7 @@ export default function HelloPage() {
                         <p className="text-gray-600 mb-4">
                             The grid system uses a 12-column layout where the sidebar takes up 3 columns (25%) and the main
                             content takes up 9 columns (75%).
-                        </p>
-                        <div className="grid grid-cols-2 gap-4 mt-6">
+                        </p>                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
                             <div className="bg-sky-50 p-4 rounded-md">
                                 <h4 className="font-semibold text-sky-900">Sub Section 1</h4>
                                 <p className="text-gray-600">Additional content can be organized in grid layouts.</p>
